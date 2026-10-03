@@ -156,7 +156,8 @@ public class Worker : BackgroundService
     {
         try
         {
-            using var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Policies\System", true);
+            // Ghi vào LocalMachine để áp dụng toàn hệ thống cho mọi phiên người dùng
+            using var key = Registry.LocalMachine.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Policies\System", true);
             if (key != null)
             {
                 if (disable)
