@@ -9,8 +9,10 @@
 (function () {
   'use strict';
 
-  const GATEWAY_WS_URL = 'ws://127.0.0.1:49150';
-  const GATEWAY_HTTP_URL = 'http://127.0.0.1:49150';
+  const isHttp = typeof window !== 'undefined' && window.location.protocol.startsWith('http');
+  const currentHost = isHttp && window.location.hostname ? window.location.hostname : '127.0.0.1';
+  const GATEWAY_WS_URL = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + currentHost + ':49150';
+  const GATEWAY_HTTP_URL = (window.location.protocol === 'https:' ? 'https://' : 'http://') + currentHost + ':49150';
 
   const STATE = {
     socket: null,
@@ -63,10 +65,23 @@
   }
 
   // ==========================================================================
-  // 1. KẾT NỐI WEBSOCKET TỚI LOCAL LAB GATEWAY
+  // 1. KẾT NỐI WEBSOCKET TỚI LOCAL LAB GATEWAY (SMART ZERO-CONSOLE-ERROR)
   // ==========================================================================
+  function isRunningUnderGateway() {
+    if (typeof window === 'undefined') return false;
+    // Chạy từ Gateway nếu port là 49150 hoặc có cờ connect=1 trong URL
+    const isGatewayPort = window.location.port === '49150' || window.location.search.includes('connect=1');
+    return isGatewayPort;
+  }
+
   function initWebSocket() {
     if (STATE.socket && (STATE.socket.readyState === WebSocket.OPEN || STATE.socket.readyState === WebSocket.CONNECTING)) {
+      return;
+    }
+
+    // Nếu không chạy từ Gateway (đang xem trước trên GitHub Pages, CI runner, file://), kích hoạt chế độ xem trước an toàn
+    if (!isRunningUnderGateway()) {
+      updateGatewayStatus(false, 'Chế độ Xem trước / Soạn bài (Chạy Chay_May_Giao_Vien.bat để kết nối 18 máy)');
       return;
     }
 
