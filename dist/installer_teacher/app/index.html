@@ -1,0 +1,2268 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LMS Phòng Máy Tương Tác 18 Máy - Môn Tin học THCS">
+  <meta name="application-version" content="3.5.0">
+  <title>LMS Phòng Máy Tương Tác 18 Máy</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+
+  <!-- Google Fonts: Inter & Fira Code cho Code Tin học -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Canvas Confetti cho hiệu ứng thi đua Live Quiz -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- SheetJS cho tính năng Đọc & Nhập file Excel (.xlsx, .xls) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- Stylesheet với Cache-Busting bắt buộc v3.5.0 -->
+  <link rel="stylesheet" href="style.css?v=3.5.0">
+
+  <!-- Tinh chỉnh Trực quan Studio Editor, Scrolling & Kahoot Grid (Bất khả xâm phạm bởi Cache) -->
+  <style id="lms-studio-direct-css">
+    /* Cho phép cuộn mượt mà trong các panel Giáo viên (Tab 1, Tab 2, Tab 3) */
+    .teacher-panel {
+      flex: 1 !important;
+      width: 100% !important;
+      height: 100% !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      scroll-behavior: smooth !important;
+    }
+    .panel-studio-container {
+      padding: 20px 24px 120px 24px !important;
+      min-height: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .studio-sidebar {
+      position: sticky !important;
+      top: 0 !important;
+      align-self: start !important;
+      max-height: calc(100vh - 120px) !important;
+      overflow-y: auto !important;
+    }
+
+    /* Layout chung Studio */
+    .studio-timeline-area {
+      background: rgba(15, 23, 42, 0.95) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 16px !important;
+      padding: 24px !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+      min-height: 900px !important;
+    }
+    .sta-header {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      background: #1e293b !important;
+      padding: 16px 20px !important;
+      border-radius: 14px !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      margin-bottom: 24px !important;
+      gap: 16px !important;
+      flex-wrap: wrap !important;
+    }
+    .sta-title-box {
+      flex: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+      min-width: 280px !important;
+    }
+    .sta-badge {
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      color: #38bdf8 !important;
+      letter-spacing: 0.8px !important;
+    }
+    .studio-title-input {
+      width: 100% !important;
+      max-width: 650px !important;
+      font-size: 18px !important;
+      font-weight: 800 !important;
+      color: #ffffff !important;
+      background: #0f172a !important;
+      border: 2px solid #38bdf8 !important;
+      border-radius: 10px !important;
+      padding: 10px 16px !important;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25) !important;
+      box-sizing: border-box !important;
+    }
+    .studio-title-input:focus {
+      outline: none !important;
+      border-color: #60a5fa !important;
+      box-shadow: 0 0 20px rgba(96, 165, 250, 0.5) !important;
+    }
+    .btn-save-studio {
+      background: linear-gradient(135deg, #059669, #10b981) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      font-weight: 800 !important;
+      font-size: 14px !important;
+      padding: 12px 24px !important;
+      border-radius: 10px !important;
+      cursor: pointer !important;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.45) !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      transition: transform 0.15s, box-shadow 0.15s !important;
+    }
+    .btn-save-studio:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.65) !important;
+    }
+
+    /* Step Card */
+    .studio-step-card {
+      background: #1e293b !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 16px !important;
+      padding: 20px 24px !important;
+      margin-bottom: 20px !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+      display: block !important;
+    }
+    .studio-step-card:hover {
+      border-color: rgba(56, 189, 248, 0.35) !important;
+    }
+    .ssc-header {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding-bottom: 12px !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      margin-bottom: 16px !important;
+    }
+    .ssc-title {
+      font-size: 15.5px !important;
+      font-weight: 800 !important;
+      color: #38bdf8 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+    .ssc-body {
+      display: block !important;
+      width: 100% !important;
+    }
+
+    /* Các hàng và nhóm trường */
+    .studio-form-row {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 16px !important;
+      width: 100% !important;
+      margin-bottom: 14px !important;
+    }
+    @media (max-width: 900px) {
+      .studio-form-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    .studio-form-col {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+      width: 100% !important;
+    }
+    .studio-form-group {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+      width: 100% !important;
+      margin-bottom: 14px !important;
+    }
+    .studio-field-label {
+      display: block !important;
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      color: #94a3b8 !important;
+      letter-spacing: 0.2px !important;
+    }
+
+    /* Inputs, Textareas, Selects */
+    .studio-input, .studio-textarea, .studio-select {
+      display: block !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      background: #0f172a !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 10px !important;
+      padding: 10px 14px !important;
+      color: #ffffff !important;
+      font-size: 13.5px !important;
+      font-family: inherit !important;
+      line-height: 1.5 !important;
+      transition: all 0.2s !important;
+    }
+    .studio-input:focus, .studio-textarea:focus, .studio-select:focus {
+      outline: none !important;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25) !important;
+      background: #0b1120 !important;
+    }
+    .studio-textarea {
+      min-height: 75px !important;
+      resize: vertical !important;
+    }
+    .studio-textarea.code-font {
+      font-family: 'Fira Code', monospace !important;
+      background: #040813 !important;
+      color: #6ee7b7 !important;
+      border-color: #059669 !important;
+      min-height: 95px !important;
+    }
+
+    /* Kahoot 4-Color Grid */
+    .studio-kahoot-grid {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 12px !important;
+      width: 100% !important;
+      margin-top: 6px !important;
+    }
+    @media (max-width: 900px) {
+      .studio-kahoot-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    .sk-card {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      padding: 10px 14px !important;
+      border-radius: 12px !important;
+      border: 1.5px solid !important;
+      box-sizing: border-box !important;
+    }
+    .sk-card.sk-red { background: rgba(239, 68, 68, 0.16) !important; border-color: #ef4444 !important; }
+    .sk-card.sk-blue { background: rgba(59, 130, 246, 0.16) !important; border-color: #3b82f6 !important; }
+    .sk-card.sk-yellow { background: rgba(245, 158, 11, 0.16) !important; border-color: #f59e0b !important; }
+    .sk-card.sk-green { background: rgba(16, 185, 129, 0.16) !important; border-color: #10b981 !important; }
+    .sk-badge {
+      font-size: 12px !important;
+      font-weight: 800 !important;
+      padding: 6px 12px !important;
+      border-radius: 8px !important;
+      color: #ffffff !important;
+      white-space: nowrap !important;
+      letter-spacing: 0.5px !important;
+    }
+    .sk-red .sk-badge { background: #ef4444 !important; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4) !important; }
+    .sk-blue .sk-badge { background: #3b82f6 !important; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4) !important; }
+    .sk-yellow .sk-badge { background: #d97706 !important; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4) !important; }
+    .sk-green .sk-badge { background: #059669 !important; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4) !important; }
+    .sk-input {
+      flex: 1 !important;
+      margin: 0 !important;
+      background: rgba(15, 23, 42, 0.85) !important;
+      border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* Nút Reset về phòng chờ & Hiệu ứng đếm ngược Master */
+    .tmc-btn-reset {
+      background: linear-gradient(135deg, #d97706, #b45309) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(251, 191, 36, 0.4) !important;
+      font-weight: 800 !important;
+    }
+    .tmc-btn-reset:hover {
+      background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.5) !important;
+    }
+    .tmc-timer-warning {
+      color: #ef4444 !important;
+      animation: pulseTimer 1s infinite alternate !important;
+      text-shadow: 0 0 10px rgba(239, 68, 68, 0.7) !important;
+    }
+    @keyframes pulseTimer {
+      from { transform: scale(1); opacity: 1; }
+      to { transform: scale(1.08); opacity: 0.85; }
+    }
+  </style>
+
+  <!-- Tự động cập nhật Service Worker & giải phóng cache cũ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(reg => reg.update());
+      });
+    }
+  </script>
+
+  <!-- Tự động nạp Manifest PWA an toàn khi chạy trên HTTP/HTTPS -->
+  <script>
+    if (window.location.protocol.startsWith('http')) {
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = 'manifest.json';
+      document.head.appendChild(link);
+    }
+  </script>
+</head>
+<body>
+
+  <!-- =========================================================
+       MÀN HÌNH 1: SẢNH CHỌN MÁY TÍNH (18 MÁY TỰ ĐỘNG MAP CHỖ NGỒI)
+  ========================================================== -->
+  <section id="screen-lobby" class="app-screen active">
+    <!-- Header Sảnh -->
+    <header class="lobby-topbar">
+      <div class="lobby-brand">
+        <div class="brand-icon" style="background:transparent;border:none;padding:0;">
+          <img src="assets/icons/app.ico" alt="CVALMS" style="width:40px;height:40px;border-radius:10px;box-shadow:0 0 12px rgba(56,189,248,0.5);">
+        </div>
+        <div>
+          <h1 class="brand-title">LMS PHÒNG MÁY TƯƠNG TÁC</h1>
+          <p class="brand-subtitle">Môn Tin học • Trường THCS Chu Văn An • Sở GD&ĐT Quảng Ngãi</p>
+        </div>
+      </div>
+
+      <div class="lobby-controls">
+        <button type="button" class="btn-author-entry" id="btn-open-author-info" title="Xem thông tin Tác giả & Bản quyền hệ thống">
+          <i class="fas fa-certificate"></i> Tác giả
+        </button>
+        <button type="button" class="btn-teacher-entry" id="btn-open-teacher-login" title="Đăng nhập Bảng điều khiển Giáo viên">
+          <i class="fas fa-chalkboard-teacher"></i> Giáo viên
+        </button>
+        <div class="device-badge-wrap" id="device-pwa-badge" title="Định danh máy phần cứng được PWA ghi nhớ">
+          <i class="fas fa-desktop"></i> Đang nhận diện thiết bị...
+        </div>
+        <div class="class-picker-wrap">
+          <label for="select-lobby-class"><i class="fas fa-users-class"></i> Lớp học:</label>
+          <select id="select-lobby-class" class="class-select">
+            <option value="6A1">Lớp 6A1</option>
+            <option value="6A2">Lớp 6A2</option>
+            <option value="7A1">Lớp 7A1</option>
+            <option value="8A1">Lớp 8A1</option>
+            <option value="9A1">Lớp 9A1</option>
+          </select>
+        </div>
+        <div class="lobby-status-pill">
+          <span class="pulse-dot"></span>
+          <span id="lobby-online-count">18 máy trực tuyến</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Thân Sảnh: Lưới 18 Máy Tính Trực Quan (Tự động Khóa/Mở theo lệnh GV) -->
+    <main class="lobby-body">
+      <div class="lobby-banner locked" id="lobby-status-banner">
+        <div class="lsb-icon-wrap" id="lsb-icon-wrap">
+          <i class="fas fa-lock" id="lsb-icon"></i>
+        </div>
+        <div class="lsb-text-wrap">
+          <h2 id="lsb-title"><i class="fas fa-desktop"></i> PHÒNG MÁY ĐANG CHỜ GIÁO VIÊN KÍCH HOẠT TIẾT HỌC</h2>
+          <p id="lsb-desc">Học sinh vui lòng ngồi ổn định tại chỗ. Sơ đồ đang được khóa để Thầy/Cô chọn lớp và kích hoạt bài học.</p>
+        </div>
+      </div>
+
+      <div class="lobby-legend">
+        <span class="legend-item"><span class="legend-badge available"></span> Trống — Sẵn sàng chọn</span>
+        <span class="legend-item"><span class="legend-badge occupied"></span> Đã có bạn chọn (Khoá)</span>
+        <span class="legend-item"><span class="legend-badge my-device"></span> Vị trí máy của em</span>
+      </div>
+
+      <!-- Lưới 18 máy tính (Mặc định có class locked-state khi chưa mở khóa) -->
+      <div class="computers-grid locked-state" id="computers-grid">
+        <!-- Render động 18 máy bởi JavaScript -->
+      </div>
+    </main>
+
+    <!-- Footer thông tin phòng máy -->
+    <footer class="lobby-footer">
+      <div class="token-info-bar">
+        <span id="device-token-status"><i class="fas fa-info-circle"></i> Trình duyệt sẵn sàng nhận diện vị trí máy</span>
+        <button type="button" class="btn-text-reset" id="btn-reset-device-token" title="Xóa lưu nhớ số máy trên thiết bị này">
+          <i class="fas fa-rotate-left"></i> Đặt lại nhớ máy
+        </button>
+      </div>
+    </footer>
+  </section>
+
+  <!-- =========================================================
+       MÀN HÌNH 2: KHÔNG GIAN LÀM VIỆC HỌC SINH (STUDENT WORKSPACE)
+  ========================================================== -->
+  <section id="screen-student" class="app-screen">
+    <!-- Header Học sinh -->
+    <header class="student-header">
+      <div class="sh-left">
+        <div class="sh-machine-badge" id="sh-machine-badge">MÁY 04</div>
+        <div class="sh-pair-info">
+          <div class="sh-students-label" id="sh-students-label">Đỗ Gia Huy & Bùi Phương Mai</div>
+          <div class="sh-class-label" id="sh-class-label">Lớp 6A1 • Môn Tin học THCS</div>
+        </div>
+      </div>
+
+      <div class="sh-right">
+        <span class="connection-status"><span class="pulse-dot"></span> Trực tuyến</span>
+        <button class="btn-change-machine" id="btn-back-to-lobby" title="Quay lại sảnh chọn máy">
+          <i class="fas fa-arrow-left"></i> Đổi máy
+        </button>
+        <button class="btn-sos" id="btn-student-sos" title="Phát tín hiệu xin trợ giúp lên màn hình giáo viên">
+          <i class="fas fa-hand-paper"></i> Cần trợ giúp
+        </button>
+      </div>
+    </header>
+
+    <!-- Không gian làm việc chính của Học sinh (Tự động chuyển view theo điều khiển của Giáo viên) -->
+    <main class="student-main">
+
+      <!-- CHẶNG 0: SẢNH CHỜ ĐẤU TRƯỜNG KAHOOT (IMMERSIVE WAITING LOBBY) -->
+      <section id="st-view-waiting" class="st-view active">
+        <div class="kahoot-lobby-stage">
+          <!-- Background Cosmic Glow -->
+          <div class="kl-cosmic-glow"></div>
+
+          <div class="kl-center-box">
+            <div class="kl-badge-pulse">
+              <span class="kl-pulse-ring"></span>
+              <span class="kl-badge-text"><i class="fas fa-satellite-dish"></i> SẢNH CHỜ PHÒNG MÁY TƯƠNG TÁC</span>
+            </div>
+
+            <h1 class="kl-lesson-title" id="waiting-lesson-title">Bài 12: Thuật toán và sơ đồ khối trong Tin học 6</h1>
+            <p class="kl-lesson-sub" id="waiting-lesson-sub">Môn Tin học • Thầy đang kiểm tra sĩ số và chuẩn bị phát lệnh bắt đầu</p>
+
+            <!-- Thẻ Danh Tính Học Sinh (Neon Hologram Card) -->
+            <div class="kl-student-card">
+              <div class="ksc-desk-badge" id="waiting-desk-info">MÁY BÀN SỐ 04</div>
+              <div class="ksc-name" id="waiting-pair-info">Đỗ Gia Huy & Bùi Phương Mai</div>
+              <div class="ksc-status">
+                <span class="pulse-dot green"></span>
+                <span>BẠN ĐÃ SẴN SÀNG TRONG PHÒNG CHỜ</span>
+              </div>
+            </div>
+
+            <!-- Tiến độ Sĩ số Đấu trường -->
+            <div class="kl-roster-status">
+              <div class="krs-header">
+                <span class="krs-label"><i class="fas fa-users"></i> TIẾN ĐỘ VÀO PHÒNG MÁY:</span>
+                <span class="krs-count" id="radar-count-label">18 máy đã kết nối</span>
+              </div>
+              <div class="krs-radar-chips" id="radar-grid">
+                <!-- Render 18 chip máy mini -->
+              </div>
+            </div>
+
+            <div class="kl-instruction-box">
+              <i class="fas fa-bolt"></i>
+              <span id="waiting-instruction-text">Các em hãy hướng mắt lên bảng. Bài học sẽ mở màn với đếm ngược <strong>3... 2... 1... 🚀</strong></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHẶNG 1: KIỂM TRA BÀI CŨ (TƯƠNG TÁC THCS) -->
+      <section id="st-view-old-lesson" class="st-view">
+        <div class="old-lesson-container">
+          <div class="ol-banner">
+            <span class="ol-phase-tag"><i class="fas fa-history"></i> BƯỚC 1: KIỂM TRA BÀI CŨ</span>
+            <div class="ol-timer" id="ol-timer"><i class="fas fa-stopwatch"></i> 02:00</div>
+          </div>
+
+          <!-- Thông báo gọi học sinh: Hộp Thoại Neon Chuẩn Ảnh Thầy Giao (1 Học Sinh Duy Nhất) -->
+          <div class="neon-lucky-card" id="neon-lucky-card" style="display:none;">
+            <div class="nlc-desk" id="nlc-desk-text">Máy bàn số 01</div>
+            <div class="nlc-name" id="nlc-student-name">Lê Hoàng Nam</div>
+            <div class="nlc-status-pill">
+              <span class="pulse-dot green"></span>
+              <span id="nlc-status-text">ĐÃ ĐƯỢC CHỈ ĐỊNH — CHỜ THẦY PHÁT ĐỀ</span>
+            </div>
+          </div>
+
+
+          <!-- Nội dung câu hỏi kiểm tra bài cũ (Chỉ chiếu câu hỏi, học sinh đứng dậy trả lời miệng) -->
+          <div class="ol-question-card">
+            <div class="ol-q-header">
+              <span class="ol-q-badge"><i class="fas fa-question-circle"></i> CÂU HỎI KIỂM TRA BÀI CŨ</span>
+              <span class="ol-q-type-badge" id="ol-q-type-badge"><i class="fas fa-comment-dots"></i> Trả lời miệng tại chỗ</span>
+            </div>
+            <div class="ol-question-text" id="ol-question-text" style="display:none;">
+              Em hãy cho biết: Trong các bộ phận cơ bản của máy tính (CPU, RAM, ROM/Ổ đĩa cứng), thiết bị nào đóng vai trò là "bộ não" điều khiển mọi hoạt động của máy tính?
+            </div>
+            <div class="ol-question-standby-banner" id="ol-question-standby-banner" style="padding:20px;text-align:center;background:rgba(15,23,42,0.6);border:1.5px dashed rgba(56,189,248,0.4);border-radius:12px;color:#94a3b8;font-size:15px;margin-top:10px;">
+              <i class="fas fa-hourglass-half fa-spin" style="color:#38bdf8;margin-right:8px;"></i> Các em hãy quan sát Thầy bốc thăm trên màn hình lớn. Câu hỏi sẽ được chiếu tới tất cả các máy ngay khi có người được chọn!
+            </div>
+
+
+            <!-- Banner Đáp Án Chuẩn Khi Thầy Công Bố -->
+            <div class="ol-reveal-box" id="ol-reveal-box" style="display:none;margin-top:18px;">
+              <div class="orb-header">
+                <i class="fas fa-check-circle"></i> ĐÁP ÁN CHUẨN CỦA THẦY:
+              </div>
+              <div class="orb-answer" id="ol-reveal-answer-text">
+                Bộ xử lý trung tâm (CPU - Central Processing Unit)
+              </div>
+              <div class="orb-explain" id="ol-reveal-explain-text">
+                Giải thích: CPU đóng vai trò như bộ não, thực hiện các phép tính số học, logic và điều phối mọi linh kiện trong máy tính.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHẶNG 2: KHỞI ĐỘNG TỨC THÌ (QUICK POLL A-B-C-D) -->
+      <section id="st-view-warmup" class="st-view">
+        <div class="poll-container">
+          <div class="poll-banner">
+            <span class="poll-phase-tag"><i class="fas fa-bolt"></i> CHẶNG 1: KHỞI ĐỘNG NHANH</span>
+            <div class="poll-timer" id="poll-timer"><i class="fas fa-clock"></i> 45s</div>
+          </div>
+
+          <div class="poll-question-header" id="poll-question-text">
+            Quan sát đoạn mã sau và cho biết kết quả in ra màn hình là gì?
+          </div>
+
+          <pre class="code-block" id="poll-code-snippet"><code>s = "Tin hoc"
+print(s[4:])</code></pre>
+          
+          <div class="poll-grid">
+            <button class="poll-opt-btn" data-choice="A">
+              <span class="poll-badge">A</span>
+              <span class="poll-label">"Tin"</span>
+            </button>
+            <button class="poll-opt-btn" data-choice="B">
+              <span class="poll-badge">B</span>
+              <span class="poll-label">"hoc"</span>
+            </button>
+            <button class="poll-opt-btn" data-choice="C">
+              <span class="poll-badge">C</span>
+              <span class="poll-label">"h"</span>
+            </button>
+            <button class="poll-opt-btn" data-choice="D">
+              <span class="poll-badge">D</span>
+              <span class="poll-label">Báo lỗi IndexError</span>
+            </button>
+          </div>
+
+          <div class="poll-status-box" id="poll-status-msg">
+            <i class="fas fa-comments"></i> Hai em hãy trao đổi nhanh và bấm chọn 1 phương án chung của máy mình:
+          </div>
+        </div>
+      </section>
+
+      <!-- CHẶNG 2: TRẠM LÝ THUYẾT PWA NOTEBOOKLM -->
+      <section id="st-view-theory" class="st-view">
+        <div class="theory-view-wrapper">
+          <div class="theory-header-bar">
+            <div>
+              <span class="badge-tag"><i class="fas fa-book-open"></i> CHẶNG 2: TRẠM KIẾN THỨC SỐ</span>
+              <h2>Tóm Tắt Khái Niệm Trọng Tâm (Trích xuất từ NotebookLM)</h2>
+            </div>
+            <div class="pwa-cache-status">
+              <i class="fas fa-bolt"></i> Nạp tức thì từ bộ đệm PWA (0.1s)
+            </div>
+          </div>
+          <div class="theory-cards-container" id="theory-cards-container">
+            <!-- Render động các thẻ kiến thức -->
+          </div>
+        </div>
+      </section>
+
+      <!-- CHẶNG 3: THẢO LUẬN & THỰC HÀNH NHÓM ĐÔI (SMART SPLIT-VIEW) -->
+      <section id="st-view-discussion" class="st-view">
+        <div class="disc-split-container">
+          <!-- Cột trái: Lý thuyết tham khảo thu gọn -->
+          <aside class="disc-left-ref">
+            <div class="dlr-header">
+              <i class="fas fa-bookmark"></i> Lý Thuyết Tra Cứu
+            </div>
+            <div class="dlr-content" id="disc-theory-reference">
+              <!-- Nội dung tra cứu -->
+            </div>
+          </aside>
+
+          <!-- Cột phải: Khung làm bài thảo luận của máy -->
+          <div class="disc-right-work">
+            <div class="disc-task-description">
+              <div class="dtd-header">
+                <span class="badge-tag"><i class="fas fa-laptop-code"></i> CHẶNG 3: NHIỆM VỤ NHÓM ĐÔI</span>
+                <span class="disc-timer"><i class="fas fa-stopwatch"></i> Thời gian: 12 phút</span>
+              </div>
+              <h3 id="disc-task-title">Nhiệm vụ Thảo luận & Thực hành</h3>
+              <div class="task-text" id="disc-task-text">
+                Cho xâu ký tự: <code>s = 'chuc mung nam moi 2026'</code><br>
+                Hai em hãy thảo luận và viết các câu lệnh Python để thực hiện:<br>
+                1. In ra độ dài của xâu s.<br>
+                2. Dùng phép cắt xâu (slicing) để trích xuất ra cụm từ 'nam moi'.<br>
+                3. Trình bày ít nhất 1 cách để đếm số lượng ký tự khoảng trắng có trong xâu s.
+              </div>
+            </div>
+
+            <div class="disc-editor-wrapper">
+              <div class="editor-header">
+                <span><i class="fas fa-code"></i> KHUNG BÀI LÀM CỦA MÁY (Gõ câu trả lời hoặc dán code Python):</span>
+              </div>
+              <textarea class="disc-answer-input" id="disc-answer-input" spellcheck="false" placeholder="# Hai em hãy nhập nội dung thảo luận hoặc code Python của nhóm vào đây..."></textarea>
+            </div>
+
+            <div class="disc-actions">
+              <div id="disc-submission-status">
+                <span class="badge-status-working"><i class="fas fa-pencil-alt"></i> Đang làm bài...</span>
+              </div>
+              <button class="btn-primary" id="btn-submit-discussion">
+                <i class="fas fa-paper-plane"></i> NỘP BÀI LÀM CỦA NHÓM
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHẶNG 4: LIVE QUIZ TRẮC NGHIỆM THI ĐUA & CỦNG CỐ -->
+      <section id="st-view-quiz" class="st-view">
+        <div class="quiz-container">
+          <div class="quiz-header-card">
+            <span class="badge-tag"><i class="fas fa-trophy"></i> CHẶNG 4: TRẮC NGHIỆM THI ĐUA (LIVE QUIZ)</span>
+            <h2>Đấu trường Trắc nghiệm Tương tác</h2>
+            <p><i class="fas fa-shield-alt" style="color:#38bdf8;"></i> Hệ thống tự động đảo ngẫu nhiên đáp án chống nhìn bài & xếp hạng thi đua 18 máy theo thời gian thực.</p>
+          </div>
+
+          <div class="quiz-card">
+            <div class="quiz-top-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div class="quiz-q-num" id="quiz-q-num" style="color:#38bdf8;font-weight:700;">Câu hỏi 1 / 1</div>
+              <div class="quiz-nav-pills" id="quiz-nav-pills" style="display:flex;gap:6px;"></div>
+            </div>
+            <div class="quiz-question" id="quiz-question-text">
+              Trong Python, xâu ký tự có tính chất bất biến (immutable). Điều này có nghĩa là gì?
+            </div>
+            
+            <!-- Vùng hiển thị động các dạng câu hỏi (Single Choice đảo màu, Đúng/Sai 4 ý, Điền kết quả) -->
+            <div id="quiz-dynamic-body">
+              <div class="quiz-options-grid" id="quiz-options-grid">
+                <button class="quiz-opt" data-qopt="A">
+                  <span class="qo-key">A</span>
+                  <span class="qo-label">Không thể truy cập các ký tự qua chỉ số index</span>
+                </button>
+                <button class="quiz-opt" data-qopt="B">
+                  <span class="qo-key">B</span>
+                  <span class="qo-label">Không thể gán thay đổi trực tiếp từng ký tự trong xâu đã tạo</span>
+                </button>
+                <button class="quiz-opt" data-qopt="C">
+                  <span class="qo-key">C</span>
+                  <span class="qo-label">Không thể dùng hàm len() để tính độ dài xâu</span>
+                </button>
+                <button class="quiz-opt" data-qopt="D">
+                  <span class="qo-key">D</span>
+                  <span class="qo-label">Xâu chỉ chứa được chữ số, không chứa được chữ cái</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="quiz-feedback" id="quiz-feedback-box" style="display:none;">
+              <!-- Phản hồi sau khi chọn -->
+            </div>
+
+            <!-- Thanh điều hướng bước làm bài đa câu hỏi (Student Stepper) -->
+            <div class="quiz-bottom-nav" id="quiz-bottom-nav" style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+              <button type="button" class="btn-quiz-nav" id="btn-quiz-prev" onclick="window.studentQuizPrev()" style="display:none;">
+                <i class="fas fa-chevron-left"></i> Câu trước
+              </button>
+              <div style="flex:1;"></div>
+              <button type="button" class="btn-quiz-nav btn-quiz-next" id="btn-quiz-next" onclick="window.studentQuizNext()" style="display:none;">
+                Câu tiếp theo <i class="fas fa-chevron-right"></i>
+              </button>
+              <button type="button" class="btn-submit-short" id="btn-quiz-packet-submit" onclick="window.studentQuizSubmitPacket()" style="display:none;background:linear-gradient(135deg,#059669,#10b981);">
+                <i class="fas fa-paper-plane"></i> NỘP BÀI HOÀN THÀNH
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </section>
+
+  <!-- =========================================================
+       MODAL 1: XÁC NHẬN CHỌN MÁY TÍNH
+  ========================================================== -->
+  <div class="modal-overlay" id="modal-confirm-machine" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-icon"><i class="fas fa-desktop"></i></div>
+        <h3 id="modal-machine-title">XÁC NHẬN MÁY BÀN SỐ 01</h3>
+      </div>
+      <div class="modal-body">
+        <p class="mb-text">Theo sơ đồ lớp <strong id="modal-class-name">6A1</strong>, vị trí này được phân công cho:</p>
+        <div class="modal-pair-tags" id="modal-pair-tags">
+          <div class="pair-tag"><i class="fas fa-user-graduate"></i> Nguyễn Văn An</div>
+          <div class="pair-tag"><i class="fas fa-user-graduate"></i> Trần Thị Bình</div>
+        </div>
+        <div class="modal-confirm-notice">
+          <i class="fas fa-shield-alt"></i> Sau khi xác nhận, máy này sẽ được khóa trên sơ đồ phòng máy và ghi nhớ cho thiết bị này.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" id="btn-modal-cancel">Hủy, chọn máy khác</button>
+        <button type="button" class="btn-confirm" id="btn-modal-confirm"><i class="fas fa-check-circle"></i> ĐÚNG VỊ TRÍ — VÀO HỌC</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 2: CẢNH BÁO CHỐNG CHỌN NHẦM MÁY (TOKEN GUARD)
+  ========================================================== -->
+  <div class="modal-overlay" id="modal-token-warning" style="display:none;">
+    <div class="modal-card warning-card">
+      <div class="modal-header warning-header">
+        <div class="modal-icon warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <h3>CẢNH BÁO: CHỌN NHẦM VỊ TRÍ MÁY!</h3>
+      </div>
+      <div class="modal-body">
+        <p class="warning-text" id="warning-text-content">
+          Thiết bị này đã được lưu định danh cố định là <strong>MÁY 04</strong>.<br>
+          Bạn không thể bấm chọn máy khác để tránh trùng lặp chỗ ngồi của bạn cùng lớp!
+        </p>
+        <div class="warning-guidance">
+          Nếu nhóm bạn đã chuyển vị trí thực tế trong phòng, hãy bấm <strong>"Đặt lại máy này"</strong> hoặc báo Thầy để mở khóa.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-warning-action" id="btn-warning-back">Về đúng máy của tôi</button>
+        <button type="button" class="btn-secondary" id="btn-warning-reset-force">Đặt lại máy này</button>
+      </div>
+    </div>
+  </div>
+
+    <!-- =========================================================
+       MÀN HÌNH 3: BẢNG ĐIỀU KHIỂN GIÁO VIÊN (TEACHER DASHBOARD)
+  ========================================================== -->
+  <section id="screen-teacher" class="app-screen">
+    <!-- Header Giáo viên: 3 Tab Điều Hướng Chuẩn Quốc Tế -->
+    <header class="teacher-header">
+      <div class="th-left">
+        <div class="th-brand-badge"><i class="fas fa-chalkboard-teacher"></i> LMS COMMAND CENTER</div>
+        <div class="th-session-title" id="th-session-title">Hệ Thống Quản Trị & Giảng Dạy Phòng Máy</div>
+      </div>
+      <div class="th-center">
+        <div class="teacher-nav-tabs">
+          <button type="button" class="tnt-btn" id="btn-tnav-classes" onclick="window.teacherSwitchTab('classes')">
+            <i class="fas fa-users-cog"></i> 1. Quản lý Lớp & Sĩ số
+          </button>
+          <button type="button" class="tnt-btn" id="btn-tnav-studio" onclick="window.teacherSwitchTab('studio')">
+            <i class="fas fa-layer-group"></i> 2. Xưởng Soạn Kịch bản
+          </button>
+          <button type="button" class="tnt-btn active" id="btn-tnav-stage" onclick="window.teacherSwitchTab('stage')">
+            <i class="fas fa-play-circle"></i> 3. Bàn Điều Khiển Sân Khấu
+          </button>
+          <button type="button" class="tnt-btn" id="btn-tnav-monitor" onclick="window.teacherSwitchTab('monitor')">
+            <i class="fas fa-desktop"></i> 4. Giám Sát Phòng Máy (18 Máy)
+          </button>
+        </div>
+      </div>
+      <div class="th-right">
+        <button type="button" class="btn-tool btn-tool-danger" id="btn-teacher-logout" title="Đăng xuất khỏi tài khoản Giáo viên">
+          <i class="fas fa-sign-out-alt"></i> Đăng xuất
+        </button>
+      </div>
+    </header>
+
+    <!-- Khung nội dung Giáo viên: 3 Phân hệ chính -->
+    <main class="teacher-main">
+
+      <!-- ===================================================
+           PHÂN HỆ 1: QUẢN LÝ LỚP & SĨ SỐ (TAB CLASSES)
+      ==================================================== -->
+      <section id="teacher-panel-classes" class="teacher-panel" style="display:none;">
+        <div class="panel-classes-container">
+          <div class="pc-topbar">
+            <div class="pc-title">
+              <i class="fas fa-users-cog"></i> QUẢN LÝ DANH SÁCH LỚP HỌC & SƠ ĐỒ MÁY
+            </div>
+            <div class="pc-actions">
+              <button type="button" class="btn-action-excel" id="btn-tab-classes-download-template" onclick="document.getElementById('btn-download-excel-template')?.click()">
+                <i class="fas fa-file-excel"></i> Tải file mẫu Excel
+              </button>
+              <label class="btn-action-excel btn-import-label">
+                <i class="fas fa-file-upload"></i> Nhập từ Excel
+                <input type="file" onchange="document.getElementById('input-excel-file').files = this.files; document.getElementById('input-excel-file').dispatchEvent(new Event('change'));" accept=".xlsx, .xls, .csv" style="display:none;">
+              </label>
+              <button type="button" class="btn-action-excel" onclick="document.getElementById('btn-export-current-excel')?.click()">
+                <i class="fas fa-file-download"></i> Xuất Excel
+              </button>
+            </div>
+          </div>
+          <div class="pc-filter-row">
+            <div class="s1-form-group">
+              <label><i class="fas fa-layer-group"></i> KHỐI:</label>
+              <select id="classes-filter-grade" class="th-select" onchange="window.filterClassesByGrade(this.value)">
+                <option value="6">Khối 6 (THCS)</option>
+                <option value="7">Khối 7 (THCS)</option>
+                <option value="8">Khối 8 (THCS)</option>
+                <option value="9">Khối 9 (THCS)</option>
+              </select>
+            </div>
+            <div class="s1-form-group">
+              <label><i class="fas fa-users"></i> LỚP ĐANG CHỌN:</label>
+              <select id="classes-select-class" class="th-select" onchange="window.teacherSelectClassForEdit(this.value)">
+                <option value="6A1">Lớp 6A1 (35 học sinh)</option>
+                <option value="6A2">Lớp 6A2 (36 học sinh)</option>
+                <option value="6A3">Lớp 6A3 (34 học sinh)</option>
+              </select>
+            </div>
+          </div>
+          <div class="pc-seating-preview" id="classes-seating-preview">
+            <!-- Render sơ đồ 18 máy của lớp đang chọn -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           PHÂN HỆ 2: XƯỞNG SOẠN KỊCH BẢN (TAB STUDIO)
+      ==================================================== -->
+      <section id="teacher-panel-studio" class="teacher-panel" style="display:none;">
+        <div class="panel-studio-container">
+          <div class="studio-layout">
+            <!-- Cột trái: Cây bài dạy theo khối -->
+            <div class="studio-sidebar">
+              <div class="sb-header"><i class="fas fa-book"></i> KHO BÀI DẠY GỐC</div>
+              <div class="sb-grade-picker">
+                <button type="button" class="sg-btn active" onclick="window.studioSelectGrade('6')">Khối 6</button>
+                <button type="button" class="sg-btn" onclick="window.studioSelectGrade('7')">Khối 7</button>
+                <button type="button" class="sg-btn" onclick="window.studioSelectGrade('8')">Khối 8</button>
+                <button type="button" class="sg-btn" onclick="window.studioSelectGrade('9')">Khối 9</button>
+              </div>
+              <div class="sb-lesson-list" id="studio-lesson-list">
+                <div class="sb-lesson-item active" onclick="window.studioLoadLesson('tin6_bai12')">
+                  <div class="sli-title">Bài 12: Thuật toán & Sơ đồ khối</div>
+                  <div class="sli-meta">Khối 6 • 5 bước • Đã lưu</div>
+                </div>
+                <div class="sb-lesson-item" onclick="window.studioLoadLesson('tin6_bai1')">
+                  <div class="sli-title">Bài 01: Thông tin và thu nhận thông tin</div>
+                  <div class="sli-meta">Khối 6 • 5 bước • Đã lưu</div>
+                </div>
+              </div>
+              <button type="button" class="btn-tool-sm btn-block" onclick="window.studioCreateNewLesson()">
+                <i class="fas fa-plus"></i> Soạn bài dạy mới
+              </button>
+            </div>
+
+            <!-- Cột phải: Dòng thời gian Timeline 5 bước có Bật/Tắt & CHỈNH SỬA TOÀN BỘ NỘI DUNG -->
+            <div class="studio-timeline-area">
+              <div class="sta-header">
+                <div class="sta-title-box">
+                  <div class="sta-badge"><i class="fas fa-edit"></i> BỘ SOẠN KỊCH BẢN BÀI DẠY (STUDIO EDITOR)</div>
+                  <input type="text" id="studio-lesson-title-input" class="studio-title-input" value="Bài 12: Thuật toán và sơ đồ khối trong Tin học 6" placeholder="Nhập tên bài dạy tại đây..." title="Bấm vào để đổi tên bài dạy">
+                </div>
+                <div class="sta-actions">
+                  <button type="button" class="btn-tool-sm" id="btn-download-excel-template" onclick="window.studioDownloadExcelTemplate()" title="Tải file Excel mẫu để soạn bài nhanh">
+                    <i class="fas fa-file-excel" style="color:#10b981;"></i> Mẫu Excel
+                  </button>
+                  <button type="button" class="btn-tool-sm" id="btn-import-excel" onclick="document.getElementById('excel-file-input').click()" title="Nạp nội dung từ file Excel / CSV">
+                    <i class="fas fa-file-import" style="color:#38bdf8;"></i> Nhập Excel
+                  </button>
+                  <input type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" style="display:none;" onchange="window.studioHandleExcelImport(event)">
+                  <button type="button" class="btn-tool-sm" id="btn-studio-preview" onclick="window.studioPreviewLesson()">
+                    <i class="fas fa-eye"></i> Xem trước
+                  </button>
+                  <button type="button" class="btn-primary btn-save-studio" id="btn-studio-save-lesson" onclick="window.studioSaveLesson()">
+                    <i class="fas fa-save"></i> LƯU KỊCH BẢN
+                  </button>
+                </div>
+              </div>
+
+              <div class="studio-steps-list" id="studio-steps-list">
+                <!-- 🔴 PHẦN 1: KHỞI ĐỘNG & BÀI CŨ -->
+                <div class="studio-step-card" data-step="1" id="studio-step-card-old-lesson" style="border-left:5px solid #ef4444;">
+                  <div class="ssc-header" style="background:rgba(239,68,68,0.08);">
+                    <div class="ssc-title">
+                      <span style="color:#ef4444;margin-right:6px;">🔴</span> <strong>KHỞI ĐỘNG & BÀI CŨ</strong>
+                    </div>
+                    <div class="seq-badge-flow">
+                      <span class="seq-chip">1. Bốc thăm</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                      <span class="seq-chip">2. Câu hỏi</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                      <span class="seq-chip">3. Đáp án</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                      <span class="seq-chip">4. Sảnh chờ</span>
+                    </div>
+                    <label class="switch-toggle" title="Bật/Tắt bước này trong tiết dạy">
+                      <input type="checkbox" checked id="step-toggle-1">
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="ssc-body">
+                    <div class="studio-form-row">
+                      <div class="studio-form-col">
+                        <label class="studio-field-label"><i class="fas fa-dice"></i> Công cụ bốc thăm:</label>
+                        <select class="studio-select" id="step-tool-1">
+                          <option value="wheel" selected>Vòng quay may mắn (Lucky Wheel)</option>
+                          <option value="slot">Máy quay số ngẫu nhiên (Slot Machine)</option>
+                          <option value="oral">Gọi trả lời miệng</option>
+                        </select>
+                      </div>
+                      <div class="studio-form-col">
+                        <label class="studio-field-label"><i class="fas fa-stopwatch"></i> Thời lượng đếm ngược:</label>
+                        <select class="studio-select" id="step-time-1">
+                          <option value="60">1 phút</option>
+                          <option value="120" selected>2 phút</option>
+                          <option value="180">3 phút</option>
+                          <option value="300">5 phút</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="studio-form-group">
+                      <label class="studio-field-label"><i class="fas fa-question-circle"></i> Câu hỏi kiểm tra bài cũ phát xuống 18 máy:</label>
+                      <textarea class="studio-textarea" id="studio-old-lesson-q" rows="2" placeholder="Nhập câu hỏi kiểm tra bài cũ...">Trong các bộ phận cơ bản của máy tính (CPU, RAM, ROM/Ổ đĩa cứng), thiết bị nào đóng vai trò là "bộ não" điều khiển mọi hoạt động của máy tính?</textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 🔷 PHẦN 2: CÁC MỤC BÀI HỌC (SECTIONS CONTAINER) -->
+                <div id="studio-sections-container">
+                  <!-- MỤC 1 -->
+                  <div class="studio-section-card" id="studio-sec-card-1" data-sec="1">
+                    <div class="section-card-header">
+                      <div class="section-header-title">
+                        <div class="section-diamond-tag">🔷 1</div>
+                        <input type="text" class="section-title-input" id="studio-sec1-title" value="Mục 1: Khái niệm & Khởi tạo Xâu Ký Tự" placeholder="Tên mục 1...">
+                      </div>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <span class="sec-act-count-tag" id="sec1-act-count-tag" style="font-size:12px;color:#38bdf8;font-weight:700;background:rgba(2,132,199,0.2);padding:4px 10px;border-radius:6px;">3 Hoạt động con</span>
+                        <button type="button" class="btn-tool-sm btn-tool-danger btn-delete-section" onclick="window.studioRemoveSection(this)" style="padding:4px 10px;font-size:12px;border-radius:6px;" title="Xóa toàn bộ Mục 1"><i class="fas fa-trash"></i> Xóa mục</button>
+                      </div>
+                    </div>
+                    <div class="section-sub-activities" id="sec1-sub-activities">
+                      <!-- Placeholder khôi phục HĐ 1.1 -->
+                      <div class="sub-act-deleted-placeholder" id="sub-act-placeholder-1-theory" style="display:none;">
+                        <div class="sadp-text"><i class="fas fa-eye-slash" style="color:#ef4444;"></i> Đã tắt: <strong>HĐ 1.1 Khám phá SGK</strong></div>
+                        <button type="button" class="btn-restore-sub-act" onclick="window.studioRestoreSubActivity(1, 'theory')"><i class="fas fa-plus-circle"></i> Bật lại hoạt động này</button>
+                      </div>
+
+                      <!-- HĐ 1.1: Khám phá SGK -->
+                      <div class="sub-activity-card" id="sub-act-1-1" data-act-type="theory">
+                        <div class="sub-activity-header">
+                          <div class="sub-act-title">
+                            <i class="fas fa-book-open" style="color:#38bdf8;"></i> HĐ 1.1: Khám phá SGK & Thẻ Tri Thức Số
+                          </div>
+                          <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="seq-badge-flow">
+                              <span class="seq-chip">1. Giao nhiệm vụ</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">2. Bắt đầu đọc</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">3. Chốt kiến thức</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">4. Sảnh chờ</span>
+                            </div>
+                            <button type="button" class="btn-delete-sub-act" onclick="window.studioRemoveSubActivity(1, 'theory')" title="Xóa hoạt động này"><i class="fas fa-trash-alt"></i> Xóa HĐ</button>
+                          </div>
+                        </div>
+                        <div class="studio-form-group">
+                          <label class="studio-field-label"><i class="fas fa-tasks"></i> Nhiệm vụ học tập / Đọc SGK Mục 1:</label>
+                          <textarea class="studio-textarea" id="studio-theory-task" rows="2" placeholder="Nhập nhiệm vụ đọc SGK...">Đọc SGK mục 1 (trang 92-93), thảo luận theo cặp đôi về khái niệm xâu ký tự và quy tắc đánh chỉ số index trong Python.</textarea>
+                        </div>
+                        <div class="studio-form-row">
+                          <div class="studio-form-col">
+                            <label class="studio-field-label"><i class="fas fa-bookmark"></i> Tài liệu đính kèm / Trang SGK:</label>
+                            <input type="text" class="studio-input" id="studio-theory-doc" value="SGK Tin học 10 Cánh Diều - Mục 1 Trang 92" placeholder="Ví dụ: SGK Tin học 10 - Trang 92...">
+                          </div>
+                          <div class="studio-form-col">
+                            <label class="studio-field-label"><i class="fas fa-stopwatch"></i> Thời lượng đọc & khám phá:</label>
+                            <select class="studio-select" id="step-time-2">
+                              <option value="120">2 phút</option>
+                              <option value="180">3 phút</option>
+                              <option value="300" selected>5 phút</option>
+                              <option value="420">7 phút</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!-- Thẻ tóm tắt NotebookLM -->
+                        <div style="margin-top:10px;padding:10px 14px;background:rgba(2,132,199,0.08);border:1px dashed rgba(56,189,248,0.3);border-radius:8px;">
+                          <div style="font-size:12.5px;color:#38bdf8;font-weight:700;margin-bottom:6px;"><i class="fas fa-sticky-note"></i> Thẻ lý thuyết chốt kiến thức:</div>
+                          <div style="font-size:12px;color:#cbd5e1;line-height:1.5;">
+                            • Thẻ 1: Khái niệm Xâu ký tự (chuỗi đặt trong nháy đơn/kép)<br>
+                            • Thẻ 2: Chỉ số Index (tính từ 0 trái qua phải, từ -1 phải qua trái)
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Placeholder khôi phục HĐ 1.2 -->
+                      <div class="sub-act-deleted-placeholder" id="sub-act-placeholder-1-quiz" style="display:none;">
+                        <div class="sadp-text"><i class="fas fa-eye-slash" style="color:#ef4444;"></i> Đã tắt: <strong>HĐ 1.2 Trắc nghiệm củng cố</strong></div>
+                        <button type="button" class="btn-restore-sub-act" onclick="window.studioRestoreSubActivity(1, 'quiz')"><i class="fas fa-plus-circle"></i> Bật lại hoạt động này</button>
+                      </div>
+
+                      <!-- HĐ 1.2: Trắc nghiệm nhanh -->
+                      <div class="sub-activity-card" id="sub-act-1-2" data-act-type="quiz">
+                        <div class="sub-activity-header">
+                          <div class="sub-act-title">
+                            <i class="fas fa-check-double" style="color:#10b981;"></i> HĐ 1.2: Trắc nghiệm củng cố Mục 1
+                            <span class="sq-badge-pill" id="sec1-quiz-count-badge" style="margin-left:8px;font-size:11.5px;padding:2px 8px;border-radius:12px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);"><i class="fas fa-layer-group"></i> Gói trắc nghiệm</span>
+                          </div>
+                          <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="seq-badge-flow">
+                              <span class="seq-chip">1. Chuẩn bị</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">2. Phát đề</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">3. Công bố đáp án</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">4. Sảnh chờ</span>
+                            </div>
+                            <button type="button" class="btn-delete-sub-act" onclick="window.studioRemoveSubActivity(1, 'quiz')" title="Xóa hoạt động này"><i class="fas fa-trash-alt"></i> Xóa HĐ</button>
+                          </div>
+                        </div>
+
+                        <!-- Vùng chứa danh sách câu hỏi động của Mục 1 -->
+                        <div class="studio-quizzes-wrapper" id="sec1-quizzes-container">
+                          <!-- Câu 1 (mặc định) -->
+                          <div class="studio-quiz-item-card" data-q-idx="0" style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;margin-bottom:10px;">
+                            <div class="sqic-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                              <span style="color:#38bdf8;font-weight:700;font-size:12.5px;"><i class="fas fa-question-circle"></i> CÂU HỎI 1:</span>
+                              <div style="display:flex;gap:8px;align-items:center;">
+                                <select class="studio-select sqic-type-select" onchange="window.studioChangeQuestionType(this)" style="padding:3px 8px;font-size:12px;width:auto;">
+                                  <option value="single_choice" selected>4 Lựa chọn (A, B, C, D)</option>
+                                  <option value="true_false">Đúng / Sai 4 mệnh đề</option>
+                                  <option value="short_answer">Điền kết quả ngắn</option>
+                                </select>
+                                <button type="button" class="btn-tool-sm btn-tool-danger" onclick="window.studioRemoveQuizQuestion(this)" style="padding:3px 8px;font-size:11px;border-radius:4px;" title="Xóa câu hỏi này"><i class="fas fa-trash"></i> Xóa</button>
+                              </div>
+                            </div>
+                            <div class="studio-form-row">
+                              <div class="studio-form-col" style="flex:2;">
+                                <label class="studio-field-label"><i class="fas fa-question"></i> Nội dung câu hỏi:</label>
+                                <input type="text" class="studio-input" id="studio-sec1-quiz-q" value="Trong Python, chỉ số (index) của phần tử đầu tiên trong xâu ký tự được đánh số bắt đầu từ mấy?" placeholder="Câu hỏi nhanh...">
+                              </div>
+                              <div class="studio-form-col">
+                                <label class="studio-field-label"><i class="fas fa-check-circle" style="color:#10b981;"></i> Đáp án đúng:</label>
+                                <select class="studio-select" id="studio-sec1-quiz-correct">
+                                  <option value="A" selected>A (Chỉ số 0)</option>
+                                  <option value="B">B (Chỉ số 1)</option>
+                                  <option value="C">C (Chỉ số -1)</option>
+                                  <option value="D">D (Tùy chọn)</option>
+                                </select>
+                              </div>
+                              <div class="studio-form-col">
+                                <label class="studio-field-label"><i class="fas fa-stopwatch"></i> Thời lượng:</label>
+                                <select class="studio-select" id="studio-sec1-quiz-time">
+                                  <option value="30">30 giây</option>
+                                  <option value="60" selected>1 phút</option>
+                                  <option value="90">1.5 phút</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Nút thêm câu hỏi vào Mục 1 -->
+                        <div style="margin-top:6px;display:flex;gap:8px;">
+                          <button type="button" class="btn-tool-sm" onclick="window.studioAddQuizQuestion(1)" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#10b981;padding:6px 14px;border-radius:6px;font-size:12.5px;font-weight:700;cursor:pointer;">
+                            <i class="fas fa-plus"></i> + Thêm câu hỏi trắc nghiệm vào Mục 1
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Placeholder khôi phục HĐ 1.3 -->
+                      <div class="sub-act-deleted-placeholder" id="sub-act-placeholder-1-practice" style="display:none;">
+                        <div class="sadp-text"><i class="fas fa-eye-slash" style="color:#ef4444;"></i> Đã tắt: <strong>HĐ 1.3 Thực hành code Python Mục 1</strong></div>
+                        <button type="button" class="btn-restore-sub-act" onclick="window.studioRestoreSubActivity(1, 'practice')"><i class="fas fa-plus-circle"></i> Bật lại hoạt động này</button>
+                      </div>
+
+                      <!-- HĐ 1.3: Thực hành code -->
+                      <div class="sub-activity-card" id="sub-act-1-3" data-act-type="practice">
+                        <div class="sub-activity-header">
+                          <div class="sub-act-title">
+                            <i class="fas fa-laptop-code" style="color:#a855f7;"></i> HĐ 1.3: Thực hành code Python Mục 1
+                          </div>
+                          <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="seq-badge-flow">
+                              <span class="seq-chip">1. Giao đề bài</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">2. Mở code</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">3. Thu bài & Mẫu</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">4. Sảnh chờ</span>
+                            </div>
+                            <button type="button" class="btn-delete-sub-act" onclick="window.studioRemoveSubActivity(1, 'practice')" title="Xóa hoạt động này"><i class="fas fa-trash-alt"></i> Xóa HĐ</button>
+                          </div>
+                        </div>
+                        <div class="studio-form-row">
+                          <div class="studio-form-col">
+                            <label class="studio-field-label"><i class="fas fa-tag"></i> Tiêu đề bài thực hành:</label>
+                            <input type="text" class="studio-input" id="studio-disc-title" value="Nhiệm vụ Thảo luận & Thực hành Nhóm đôi" placeholder="Tên bài thực hành...">
+                          </div>
+                          <div class="studio-form-col">
+                            <label class="studio-field-label"><i class="fas fa-stopwatch"></i> Thời lượng thực hành:</label>
+                            <select class="studio-select" id="step-time-3">
+                              <option value="300">5 phút</option>
+                              <option value="600" selected>10 phút</option>
+                              <option value="720">12 phút</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="studio-form-group">
+                          <label class="studio-field-label"><i class="fas fa-file-code"></i> Yêu cầu đề bài thực hành:</label>
+                          <textarea class="studio-textarea" id="studio-disc-task" rows="2" placeholder="Yêu cầu đề bài thực hành...">Cho xâu ký tự: s = 'chuc mung nam moi 2026'
+Hai em hãy thảo luận và viết các câu lệnh Python để thực hiện:
+1. In ra độ dài của xâu s.
+2. Dùng phép cắt xâu (slicing) để trích xuất ra cụm từ 'nam moi'.</textarea>
+                        </div>
+                        <div class="studio-form-group">
+                          <label class="studio-field-label"><i class="fas fa-code"></i> Mã Python gợi ý ban đầu (Code Template):</label>
+                          <textarea class="studio-textarea code-font" id="studio-disc-starter" rows="2" placeholder="Mã Python gợi ý..."># Gợi ý bài thực hành xâu ký tự:
+s = 'chuc mung nam moi 2026'
+print("1. Độ dài xâu:", len(s))
+print("2. Cắt xâu:", s[10:17])</textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MỤC 2 -->
+                  <div class="studio-section-card" id="studio-sec-card-2" data-sec="2">
+                    <div class="section-card-header">
+                      <div class="section-header-title">
+                        <div class="section-diamond-tag">🔷 2</div>
+                        <input type="text" class="section-title-input" id="studio-sec2-title" value="Mục 2: Phép Cắt Xâu Ký Tự (Slicing)" placeholder="Tên mục 2...">
+                      </div>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <span class="sec-act-count-tag" id="sec2-act-count-tag" style="font-size:12px;color:#38bdf8;font-weight:700;background:rgba(2,132,199,0.2);padding:4px 10px;border-radius:6px;">3 Hoạt động con</span>
+                        <button type="button" class="btn-tool-sm btn-tool-danger btn-delete-section" onclick="window.studioRemoveSection(this)" style="padding:4px 10px;font-size:12px;border-radius:6px;" title="Xóa toàn bộ Mục 2"><i class="fas fa-trash"></i> Xóa mục</button>
+                      </div>
+                    </div>
+                    <div class="section-sub-activities" id="sec2-sub-activities">
+                      <!-- Placeholder khôi phục HĐ 2.1 -->
+                      <div class="sub-act-deleted-placeholder" id="sub-act-placeholder-2-theory" style="display:none;">
+                        <div class="sadp-text"><i class="fas fa-eye-slash" style="color:#ef4444;"></i> Đã tắt: <strong>HĐ 2.1 Khám phá cú pháp Cắt Xâu</strong></div>
+                        <button type="button" class="btn-restore-sub-act" onclick="window.studioRestoreSubActivity(2, 'theory')"><i class="fas fa-plus-circle"></i> Bật lại hoạt động này</button>
+                      </div>
+
+                      <!-- HĐ 2.1: Khám phá cú pháp -->
+                      <div class="sub-activity-card" id="sub-act-2-1" data-act-type="theory">
+                        <div class="sub-activity-header">
+                          <div class="sub-act-title">
+                            <i class="fas fa-book-open" style="color:#38bdf8;"></i> HĐ 2.1: Khám phá cú pháp Cắt Xâu (Slicing)
+                          </div>
+                          <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="seq-badge-flow">
+                              <span class="seq-chip">1. Giao nhiệm vụ</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">2. Bắt đầu đọc</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">3. Chốt kiến thức</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">4. Sảnh chờ</span>
+                            </div>
+                            <button type="button" class="btn-delete-sub-act" onclick="window.studioRemoveSubActivity(2, 'theory')" title="Xóa hoạt động này"><i class="fas fa-trash-alt"></i> Xóa HĐ</button>
+                          </div>
+                        </div>
+                        <div class="studio-form-group">
+                          <label class="studio-field-label"><i class="fas fa-tasks"></i> Nhiệm vụ học tập / Đọc SGK Mục 2:</label>
+                          <textarea class="studio-textarea" id="studio-sec2-theory-task" rows="2" placeholder="Nhiệm vụ đọc SGK mục 2...">Đọc SGK mục 2 (trang 94), thảo luận cú pháp cắt xâu s[start:stop] và tính chất bất biến (immutable) của xâu.</textarea>
+                        </div>
+                        <div class="studio-form-row">
+                          <div class="studio-form-col">
+                            <label class="studio-field-label"><i class="fas fa-bookmark"></i> Tài liệu đính kèm:</label>
+                            <input type="text" class="studio-input" id="studio-sec2-theory-doc" value="SGK Tin học 10 Cánh Diều - Mục 2 Trang 94" placeholder="Tài liệu...">
+                          </div>
+                          <div class="studio-form-col">
+                            <label class="studio-field-label"><i class="fas fa-stopwatch"></i> Thời lượng đọc:</label>
+                            <select class="studio-select" id="studio-sec2-theory-time">
+                              <option value="180">3 phút</option>
+                              <option value="300" selected>5 phút</option>
+                              <option value="420">7 phút</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Placeholder khôi phục HĐ 2.2 -->
+                      <div class="sub-act-deleted-placeholder" id="sub-act-placeholder-2-quiz" style="display:none;">
+                        <div class="sadp-text"><i class="fas fa-eye-slash" style="color:#ef4444;"></i> Đã tắt: <strong>HĐ 2.2 Trắc nghiệm củng cố Mục 2</strong></div>
+                        <button type="button" class="btn-restore-sub-act" onclick="window.studioRestoreSubActivity(2, 'quiz')"><i class="fas fa-plus-circle"></i> Bật lại hoạt động này</button>
+                      </div>
+
+                      <!-- HĐ 2.2: Trắc nghiệm code -->
+                      <div class="sub-activity-card" id="sub-act-2-2" data-act-type="quiz">
+                        <div class="sub-activity-header">
+                          <div class="sub-act-title">
+                            <i class="fas fa-check-double" style="color:#10b981;"></i> HĐ 2.2: Trắc nghiệm củng cố Mục 2
+                            <span class="sq-badge-pill" id="sec2-quiz-count-badge" style="margin-left:8px;font-size:11.5px;padding:2px 8px;border-radius:12px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);"><i class="fas fa-layer-group"></i> Gói trắc nghiệm</span>
+                          </div>
+                          <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="seq-badge-flow">
+                              <span class="seq-chip">1. Chuẩn bị</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">2. Phát đề</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">3. Công bố đáp án</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">4. Sảnh chờ</span>
+                            </div>
+                            <button type="button" class="btn-delete-sub-act" onclick="window.studioRemoveSubActivity(2, 'quiz')" title="Xóa hoạt động này"><i class="fas fa-trash-alt"></i> Xóa HĐ</button>
+                          </div>
+                        </div>
+
+                        <!-- Vùng chứa danh sách câu hỏi động của Mục 2 -->
+                        <div class="studio-quizzes-wrapper" id="sec2-quizzes-container">
+                          <!-- Câu 1 (mặc định) -->
+                          <div class="studio-quiz-item-card" data-q-idx="0" style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;margin-bottom:10px;">
+                            <div class="sqic-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                              <span style="color:#38bdf8;font-weight:700;font-size:12.5px;"><i class="fas fa-question-circle"></i> CÂU HỎI 1:</span>
+                              <div style="display:flex;gap:8px;align-items:center;">
+                                <select class="studio-select sqic-type-select" onchange="window.studioChangeQuestionType(this)" style="padding:3px 8px;font-size:12px;width:auto;">
+                                  <option value="single_choice" selected>4 Lựa chọn (A, B, C, D)</option>
+                                  <option value="true_false">Đúng / Sai 4 mệnh đề</option>
+                                  <option value="short_answer">Điền kết quả ngắn</option>
+                                </select>
+                                <button type="button" class="btn-tool-sm btn-tool-danger" onclick="window.studioRemoveQuizQuestion(this)" style="padding:3px 8px;font-size:11px;border-radius:4px;" title="Xóa câu hỏi này"><i class="fas fa-trash"></i> Xóa</button>
+                              </div>
+                            </div>
+                            <div class="studio-form-row">
+                              <div class="studio-form-col" style="flex:2;">
+                                <label class="studio-field-label"><i class="fas fa-question"></i> Câu hỏi trắc nghiệm code:</label>
+                                <input type="text" class="studio-input" id="studio-sec2-quiz-q" value="Cho xâu s = 'VIETNAM'. Kết quả của biểu thức s[0:4] là gì?" placeholder="Câu hỏi trắc nghiệm...">
+                              </div>
+                              <div class="studio-form-col">
+                                <label class="studio-field-label"><i class="fas fa-check-circle" style="color:#10b981;"></i> Đáp án đúng:</label>
+                                <select class="studio-select" id="studio-sec2-quiz-correct">
+                                  <option value="A" selected>A ('VIET')</option>
+                                  <option value="B">B ('VIETN')</option>
+                                  <option value="C">C ('VIE')</option>
+                                  <option value="D">D ('ETNA')</option>
+                                </select>
+                              </div>
+                              <div class="studio-form-col">
+                                <label class="studio-field-label"><i class="fas fa-stopwatch"></i> Thời lượng:</label>
+                                <select class="studio-select" id="studio-sec2-quiz-time">
+                                  <option value="30">30 giây</option>
+                                  <option value="60" selected>1 phút</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Nút thêm câu hỏi vào Mục 2 -->
+                        <div style="margin-top:6px;display:flex;gap:8px;">
+                          <button type="button" class="btn-tool-sm" onclick="window.studioAddQuizQuestion(2)" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#10b981;padding:6px 14px;border-radius:6px;font-size:12.5px;font-weight:700;cursor:pointer;">
+                            <i class="fas fa-plus"></i> + Thêm câu hỏi trắc nghiệm vào Mục 2
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Placeholder khôi phục HĐ 2.3 -->
+                      <div class="sub-act-deleted-placeholder" id="sub-act-placeholder-2-practice" style="display:none;">
+                        <div class="sadp-text"><i class="fas fa-eye-slash" style="color:#ef4444;"></i> Đã tắt: <strong>HĐ 2.3 Thực hành nhóm cắt và ghép xâu</strong></div>
+                        <button type="button" class="btn-restore-sub-act" onclick="window.studioRestoreSubActivity(2, 'practice')"><i class="fas fa-plus-circle"></i> Bật lại hoạt động này</button>
+                      </div>
+
+                      <!-- HĐ 2.3: Thực hành nhóm -->
+                      <div class="sub-activity-card" id="sub-act-2-3" data-act-type="practice">
+                        <div class="sub-activity-header">
+                          <div class="sub-act-title">
+                            <i class="fas fa-laptop-code" style="color:#a855f7;"></i> HĐ 2.3: Thực hành nhóm cắt và ghép xâu
+                          </div>
+                          <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="seq-badge-flow">
+                              <span class="seq-chip">1. Giao đề bài</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">2. Mở code</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">3. Thu bài & Mẫu</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                              <span class="seq-chip">4. Sảnh chờ</span>
+                            </div>
+                            <button type="button" class="btn-delete-sub-act" onclick="window.studioRemoveSubActivity(2, 'practice')" title="Xóa hoạt động này"><i class="fas fa-trash-alt"></i> Xóa HĐ</button>
+                          </div>
+                        </div>
+                        <div class="studio-form-group">
+                          <label class="studio-field-label"><i class="fas fa-file-code"></i> Yêu cầu bài tập nhóm:</label>
+                          <textarea class="studio-textarea" id="studio-sec2-prac-task" rows="2" placeholder="Yêu cầu bài tập...">Cho xâu s = 'chuc mung nam moi 2026'. Viết lệnh cắt ra cụm từ 'nam moi' và in ra màn hình.</textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Nút thêm mục mới -->
+                <button type="button" class="btn-add-section" onclick="window.studioAddNewSection()">
+                  <i class="fas fa-plus-circle"></i> + THÊM MỤC BÀI HỌC MỚI (MỤC 3, MỤC 4...)
+                </button>
+
+                <!-- 🏆 PHẦN 3: TỔNG KẾT — ĐẤU TRƯỜNG KAHOOT & BỤC VINH DANH PODIUM 3D -->
+                <div class="studio-step-card" data-step="4" id="studio-step-card-quiz" style="border-left:5px solid #f59e0b;">
+                  <div class="ssc-header" style="background:rgba(245,158,11,0.08);">
+                    <div class="ssc-title">
+                      <span style="color:#f59e0b;margin-right:6px;">🏆</span> <strong>TỔNG KẾT: ĐẤU TRƯỜNG KAHOOT & BỤC VINH DANH PODIUM 3D</strong>
+                    </div>
+                    <div class="seq-badge-flow">
+                      <span class="seq-chip">1. Khởi động đấu trường</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                      <span class="seq-chip">2. Phát đề thi đua</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                      <span class="seq-chip">3. Bục vinh danh</span> <i class="fas fa-arrow-right seq-arrow"></i>
+                      <span class="seq-chip">4. Tổng kết</span>
+                    </div>
+                    <label class="switch-toggle" title="Bật/Tắt bước này trong tiết dạy">
+                      <input type="checkbox" checked id="step-toggle-4">
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="ssc-body">
+                    <div class="studio-form-row">
+                      <div class="studio-form-col">
+                        <label class="studio-field-label"><i class="fas fa-list-ul"></i> Dạng câu hỏi trắc nghiệm:</label>
+                        <select class="studio-select" id="studio-quiz-type" onchange="window.studioOnQuizTypeChange(this.value)">
+                          <option value="single_choice" selected>1. Trắc nghiệm 4 lựa chọn (A, B, C, D)</option>
+                          <option value="true_false">2. Trắc nghiệm Đúng / Sai 4 ý (Chuẩn BGD&ĐT 2025)</option>
+                          <option value="short_answer">3. Trắc nghiệm Điền kết quả ngắn / Nhẩm code</option>
+                        </select>
+                      </div>
+                      <div class="studio-form-col">
+                        <label class="studio-field-label"><i class="fas fa-hourglass-half"></i> Thời gian mỗi câu hỏi:</label>
+                        <select class="studio-select" id="step-time-4">
+                          <option value="15">15 giây</option>
+                          <option value="20" selected>20 giây</option>
+                          <option value="30">30 giây</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- Công tắc Đảo đáp án chống nhìn bài -->
+                    <div class="studio-anti-cheat-box" style="margin:10px 0 14px 0;padding:8px 12px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:8px;">
+                      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:#38bdf8;font-size:13.5px;font-weight:600;margin:0;">
+                        <input type="checkbox" id="studio-quiz-shuffle" checked style="width:16px;height:16px;accent-color:#38bdf8;">
+                        <span><i class="fas fa-shield-alt"></i> Tự động đảo đáp án ngẫu nhiên giữa 18 máy trạm (Chống nhìn bài nhau)</span>
+                      </label>
+                    </div>
+
+                    <div class="studio-form-group">
+                      <label class="studio-field-label"><i class="fas fa-question"></i> Nội dung câu hỏi trắc nghiệm Đấu trường:</label>
+                      <textarea class="studio-textarea" id="studio-quiz-q" rows="2" placeholder="Nhập nội dung câu hỏi trắc nghiệm...">Trong Python, xâu ký tự có tính chất bất biến (immutable). Điều này có nghĩa là gì?</textarea>
+                    </div>
+
+                    <!-- Dạng 1: 4 Phương án Kahoot -->
+                    <div class="studio-form-group" id="studio-quiz-single-wrap">
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <label class="studio-field-label"><i class="fas fa-palette"></i> 4 Phương án trả lời (4 Màu Đấu trường Kahoot):</label>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                          <label class="studio-field-label" style="margin:0;"><i class="fas fa-check-circle" style="color:#10b981;"></i> Đáp án đúng:</label>
+                          <select class="studio-select" id="studio-quiz-correct" style="width:120px;padding:4px 8px;">
+                            <option value="A">Đáp án A (Đỏ)</option>
+                            <option value="B" selected>Đáp án B (Lam)</option>
+                            <option value="C">Đáp án C (Vàng)</option>
+                            <option value="D">Đáp án D (Lục)</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="studio-kahoot-grid">
+                        <div class="sk-card sk-red">
+                          <div class="sk-badge">A (ĐỎ)</div>
+                          <input type="text" class="studio-input sk-input" id="studio-quiz-opt-a" value="Không thể truy cập các ký tự qua chỉ số index" placeholder="Phương án A (Đỏ)...">
+                        </div>
+                        <div class="sk-card sk-blue">
+                          <div class="sk-badge">B (LAM)</div>
+                          <input type="text" class="studio-input sk-input" id="studio-quiz-opt-b" value="Không thể gán thay đổi trực tiếp từng ký tự trong xâu đã tạo" placeholder="Phương án B (Lam)...">
+                        </div>
+                        <div class="sk-card sk-yellow">
+                          <div class="sk-badge">C (VÀNG)</div>
+                          <input type="text" class="studio-input sk-input" id="studio-quiz-opt-c" value="Không thể dùng hàm len() để tính độ dài xâu" placeholder="Phương án C (Vàng)...">
+                        </div>
+                        <div class="sk-card sk-green">
+                          <div class="sk-badge">D (LỤC)</div>
+                          <input type="text" class="studio-input sk-input" id="studio-quiz-opt-d" value="Xâu chỉ chứa được chữ số, không chứa được chữ cái" placeholder="Phương án D (Lục)...">
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Dạng 2: Đúng/Sai 4 mệnh đề -->
+                    <div class="studio-form-group" id="studio-quiz-tf-wrap" style="display:none;">
+                      <label class="studio-field-label"><i class="fas fa-tasks"></i> Thiết lập 4 mệnh đề Đúng / Sai:</label>
+                      <div class="tf-editor-grid" style="display:flex;flex-direction:column;gap:8px;">
+                        <div class="tf-item-row" style="display:flex;gap:8px;align-items:center;">
+                          <span style="color:#38bdf8;font-weight:700;width:24px;">a)</span>
+                          <input type="text" class="studio-input" id="studio-tf-stmt-a" value="s[0] trả về ký tự đầu tiên của xâu" style="flex:1;">
+                          <select class="studio-select" id="studio-tf-ans-a" style="width:110px;"><option value="true" selected>ĐÚNG</option><option value="false">SAI</option></select>
+                        </div>
+                        <div class="tf-item-row" style="display:flex;gap:8px;align-items:center;">
+                          <span style="color:#38bdf8;font-weight:700;width:24px;">b)</span>
+                          <input type="text" class="studio-input" id="studio-tf-stmt-b" value="s[-1] trả về ký tự đầu tiên của xâu" style="flex:1;">
+                          <select class="studio-select" id="studio-tf-ans-b" style="width:110px;"><option value="true">ĐÚNG</option><option value="false" selected>SAI</option></select>
+                        </div>
+                        <div class="tf-item-row" style="display:flex;gap:8px;align-items:center;">
+                          <span style="color:#38bdf8;font-weight:700;width:24px;">c)</span>
+                          <input type="text" class="studio-input" id="studio-tf-stmt-c" value="Cú pháp cắt xâu s[start:end] lấy đến vị trí end-1" style="flex:1;">
+                          <select class="studio-select" id="studio-tf-ans-c" style="width:110px;"><option value="true" selected>ĐÚNG</option><option value="false">SAI</option></select>
+                        </div>
+                        <div class="tf-item-row" style="display:flex;gap:8px;align-items:center;">
+                          <span style="color:#38bdf8;font-weight:700;width:24px;">d)</span>
+                          <input type="text" class="studio-input" id="studio-tf-stmt-d" value="Có thể gán thay đổi trực tiếp từng ký tự trong xâu đã tạo" style="flex:1;">
+                          <select class="studio-select" id="studio-tf-ans-d" style="width:110px;"><option value="true">ĐÚNG</option><option value="false" selected>SAI</option></select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Dạng 3: Điền kết quả ngắn -->
+                    <div class="studio-form-group" id="studio-quiz-sa-wrap" style="display:none;">
+                      <label class="studio-field-label"><i class="fas fa-keyboard"></i> Đáp án kết quả đúng (Học sinh gõ kết quả):</label>
+                      <input type="text" class="studio-input" id="studio-sa-correct" value="TinHoc" placeholder="Ví dụ: TinHoc hoặc 5...">
+                    </div>
+
+                    <!-- Tự động kích hoạt Podium khi kết thúc -->
+                    <div style="margin-top:10px;padding:8px 12px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:8px;display:flex;align-items:center;gap:10px;">
+                      <i class="fas fa-trophy" style="color:#fbbf24;font-size:16px;"></i>
+                      <span style="color:#fcd34d;font-size:13px;">Tự động kích hoạt <strong>Bục vinh danh Podium Top 1, 2, 3</strong> dựa trên tổng điểm thi đua của 18 máy khi hoàn thành.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           PHÂN HỆ 3: BÀN ĐIỀU KHIỂN SÂN KHẤU (TAB STAGE)
+      ==================================================== -->
+      <section id="teacher-panel-stage" class="teacher-panel active">
+
+        <!-- Giai đoạn 1: Thiết lập & Kích hoạt Lớp học -->
+        <section id="teacher-stage-hardware" class="teacher-stage active">
+          <div class="stage1-container">
+            <div class="stage1-action-bar">
+              <div class="s1-form-group">
+                <label for="teacher-select-grade"><i class="fas fa-layer-group"></i> 1. KHỐI LỚP:</label>
+                <select id="teacher-select-grade" class="th-select" onchange="window.teacherOnGradeChange(this.value)">
+                  <option value="6">Khối 6 (THCS)</option>
+                  <option value="7">Khối 7 (THCS)</option>
+                  <option value="8">Khối 8 (THCS)</option>
+                  <option value="9">Khối 9 (THCS)</option>
+                </select>
+              </div>
+
+              <div class="s1-form-group">
+                <label for="teacher-select-class"><i class="fas fa-users-class"></i> 2. CHỌN LỚP DẠY:</label>
+                <select id="teacher-select-class" class="th-select">
+                  <option value="6A1">Lớp 6A1 (35 học sinh • 18 máy)</option>
+                  <option value="6A2">Lớp 6A2 (36 học sinh • 18 máy)</option>
+                  <option value="6A3">Lớp 6A3 (34 học sinh • 18 máy)</option>
+                </select>
+              </div>
+
+              <div class="s1-form-group">
+                <label for="teacher-select-lesson"><i class="fas fa-book"></i> 3. CHỌN BÀI DẠY:</label>
+                <select id="teacher-select-lesson" class="th-select">
+                  <option value="tin6_bai12">Bài 12: Thuật toán và sơ đồ khối</option>
+                  <option value="tin6_bai1">Bài 01: Thông tin và thu nhận thông tin</option>
+                  <option value="tin6_bai4">Bài 04: Mạng máy tính và Internet</option>
+                </select>
+              </div>
+
+              <button type="button" class="btn-start-session" id="btn-start-class-session">
+                <i class="fas fa-play-circle"></i> LƯU LẠI & KÍCH HOẠT TIẾT HỌC
+              </button>
+            </div>
+
+            <div class="stage1-info-bar">
+              <div class="s1-summary-tag">
+                <i class="fas fa-info-circle"></i> <strong>TÌNH TRẠNG PHÒNG MÁY:</strong>
+                <span id="hardware-status-summary" style="color:#34d399;margin-left:6px;">18/18 máy sẵn sàng kết nối</span>
+              </div>
+              <p class="s1-hint-text">
+                * Khi Thầy bấm <strong>"LƯU LẠI & KÍCH HOẠT TIẾT HỌC"</strong>, dữ liệu lớp sẽ được truyền thẳng xuống 18 máy học sinh và mở khóa để học sinh chọn máy.
+              </p>
+            </div>
+
+            <!-- Lưới 18 máy kiểm tra phần cứng (Online / Offline) -->
+            <div class="hardware-grid-18" id="hardware-grid-18">
+              <!-- Render 18 máy bởi JS -->
+            </div>
+          </div>
+        </section>
+
+      <!-- ===================================================
+           GIAI ĐOẠN 2: TIẾT HỌC CHÍNH THỨC (ĐIỂM DANH & CÁC BƯỚC)
+      ==================================================== -->
+      <section id="teacher-stage-active" class="teacher-stage">
+        <!-- THANH ĐIỀU KHIỂN SÂN KHẤU ĐỘNG (DYNAMIC STAGE HEADER) -->
+        <div class="teacher-dynamic-control-header" id="teacher-dynamic-control-header">
+          <!-- Cụm bên trái: Bài học & Sĩ số phòng chờ -->
+          <div class="tdch-left">
+            <div class="tdch-lesson-title" id="tdch-lesson-title">
+              <i class="fas fa-book-open" style="color:#38bdf8;"></i> <span id="tdch-lesson-name">Bài 12: Thuật toán và sơ đồ khối</span>
+            </div>
+            <div class="tdch-status-badge" id="tdch-waiting-badge">
+              <span class="pulse-dot"></span> <span id="tdch-waiting-count">Phòng chờ: 0/18 máy</span>
+            </div>
+          </div>
+
+          <!-- Cụm ở giữa: Đồng hồ Master Pill -->
+          <div class="tdch-center">
+            <div class="tdch-timer-pill" id="tdch-timer-pill">
+              <i class="fas fa-stopwatch" style="color:#10b981;"></i>
+              <span class="tdch-timer-display" id="master-timer-display">00:00</span>
+              <button type="button" class="tdch-timer-btn" id="btn-master-pause-timer" onclick="window.masterPauseTimer()" title="Tạm dừng / Tiếp tục đồng hồ">
+                <i class="fas fa-pause"></i>
+              </button>
+              <button type="button" class="tdch-timer-btn" id="btn-master-add-time" onclick="window.masterAddTime(30)" title="Cộng thêm 30 giây">
+                +30s
+              </button>
+            </div>
+          </div>
+
+          <!-- Cụm bên phải: Nút Kết thúc tiết học an toàn -->
+          <div class="tdch-right">
+            <button type="button" class="btn-end-session-safe" id="btn-end-class-session" title="Lưu điểm, dọn sạch 18 máy và kết thúc tiết dạy" onclick="window.teacherEndSession()">
+              <i class="fas fa-stop-circle"></i> KẾT THÚC TIẾT HỌC
+            </button>
+          </div>
+        </div>
+
+        <!-- THANH ĐIỀU HƯỚNG TIẾN TRÌNH THEO MỤC BÀI HỌC (SECTION NAVIGATOR) -->
+        <div class="stage-section-navigator" id="stage-section-navigator" style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:#0b1120;border-bottom:1px solid rgba(255,255,255,0.08);overflow-x:auto;">
+          <!-- Render động danh sách các mục: Khởi động, Mục 1, Mục 2, Tổng kết -->
+        </div>
+
+        <!-- THANH DANH SÁCH HOẠT ĐỘNG KỊCH BẢN ĐỘNG (DYNAMIC ACTIVITY PIPELINE DỰA VÀO XƯỞNG SOẠN) -->
+        <div class="teacher-dynamic-pipeline" id="teacher-dynamic-pipeline">
+          <!-- Render động các thẻ hoạt động -->
+        </div>
+
+        <!-- Bố cục tác nghiệp Giáo viên: Tách biệt hoàn toàn từng Tab (100% Width Full View) -->
+        <div class="teacher-full-workspace">
+          <!-- Chặng 0: Điểm danh (Chiếm 100% màn hình) -->
+          <div id="tw-panel-waiting" class="tw-panel active">
+            <div class="attendance-top-bar">
+              <div class="atb-info">
+                <span class="atb-title"><i class="fas fa-clipboard-check"></i> SƠ ĐỒ ĐIỂM DANH & VỊ TRÍ CHỖ NGỒI (18 MÁY)</span>
+                <span class="atb-subtitle">Học sinh mở máy PWA và tự động nhận vị trí theo sơ đồ lớp</span>
+              </div>
+              <div class="atb-stats">
+                <div class="atb-stat-pill success">
+                  <span class="pulse-dot"></span>
+                  <span>Đã vào: <strong id="stat-checkedin">2</strong>/18 máy</span>
+                </div>
+                <div class="atb-stat-pill warning">
+                  <span>Chưa vào: <strong id="stat-missing">16</strong> máy</span>
+                </div>
+                <span class="tcm-badge" id="tcm-checkin-count" style="display:none;">Đã vào: 2/18 máy</span>
+              </div>
+            </div>
+
+            <!-- Lưới 18 máy toàn màn hình rộng rãi -->
+            <div class="active-session-grid-18" id="active-session-grid-18">
+              <!-- Render 18 ô máy có tên học sinh theo sơ đồ lớp -->
+            </div>
+
+            <!-- Nút bắt đầu bài học to rõ, nổi bật ở chân trang -->
+            <div class="attendance-action-footer">
+              <button type="button" class="btn-primary btn-start-lesson-hero" id="btn-start-lesson-hero" onclick="window.teacherStartLesson()">
+                <i class="fas fa-rocket"></i> ĐIỂM DANH XONG — BẮT ĐẦU BÀI HỌC (CHUYỂN SANG BƯỚC 1: KIỂM TRA BÀI CŨ)
+              </button>
+            </div>
+          </div>
+
+          <!-- BƯỚC 1: BẢNG TÁC NGHIỆP KIỂM TRA BÀI CŨ (100% WIDTH FULL VIEW) -->
+          <div id="tw-panel-old-lesson" class="tw-panel">
+            <div class="ol-tw-full-container">
+              <!-- Hàng 1: Spotlight Học sinh được gọi & Đồng hồ tĩnh 02:00 -->
+              <div class="ol-top-banner">
+                <div class="ol-spotlight-card" id="ol-teacher-spotlight">
+                  <div class="ots-icon"><i class="fas fa-bullhorn"></i></div>
+                  <div class="ots-info">
+                    <div class="ots-label">HỌC SINH ĐƯỢC CHỈ ĐỊNH ĐỨNG DẬY TRẢ LỜI:</div>
+                    <div class="ots-name" id="ots-student-name">Chưa bốc thăm (Bấm nút [1. 🎲 BỐC THĂM] để chọn ngẫu nhiên)</div>
+                  </div>
+                  <div class="ots-timer-wrap">
+                    <span class="ots-timer" id="ots-timer-display">02:00</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hàng 2: Soạn câu hỏi & Bàn điều khiển 4 nút tuần tự -->
+              <div class="ol-controls-card">
+                <div class="otc-row">
+                  <label><i class="fas fa-question-circle"></i> Câu hỏi kiểm tra bài cũ:</label>
+                  <input type="text" class="otc-input" id="otc-question-input" value="Trong máy tính, thiết bị nào đóng vai trò là 'bộ não' điều khiển mọi hoạt động?">
+                </div>
+
+                <!-- BÀN ĐIỀU KHIỂN 4 BƯỚC TUẦN TỰ SƯ PHẠM -->
+                <div class="ol-sequential-actions">
+                  <button type="button" class="btn-ol-step btn-ol-draw" id="btn-ol-step-1-draw" onclick="window.openLuckyDrawModal()">
+                    <i class="fas fa-dice"></i> 1. BỐC THĂM
+                  </button>
+                  <button type="button" class="btn-ol-step btn-ol-question disabled" id="btn-ol-step-2-question" disabled onclick="window.broadcastOldLessonStart()">
+                    <i class="fas fa-paper-plane"></i> 2. CÂU HỎI
+                  </button>
+                  <button type="button" class="btn-ol-step btn-ol-answer disabled" id="btn-ol-step-3-answer" disabled onclick="window.teacherRevealOldLesson()">
+                    <i class="fas fa-bullhorn"></i> 3. ĐÁP ÁN
+                  </button>
+                  <button type="button" class="btn-ol-step btn-ol-waiting" id="btn-ol-step-4-waiting" onclick="window.teacherFinishOldLessonToLobby()">
+                    <i class="fas fa-undo"></i> 4. PHÒNG CHỜ
+                  </button>
+                </div>
+              </div>
+
+              <!-- Hàng 3: Danh sách bài nộp của 18 máy theo thời gian thực -->
+              <div class="ol-submissions-box">
+                <div class="osb-header">
+                  <h4><i class="fas fa-list-alt"></i> BÀI LÀM CỦA 18 MÁY THEO THỜI GIAN THỰC</h4>
+                  <span class="osb-count" id="ol-submitted-count">Đã nộp: 0/18 máy</span>
+                </div>
+                <div class="ol-submissions-list" id="ol-submissions-list">
+                  <!-- Render động bài nộp của các máy -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BƯỚC 2: BẢNG TÁC NGHIỆP KHÁM PHÁ KIẾN THỨC SGK (100% WIDTH FULL VIEW) -->
+          <div id="tw-panel-warmup" class="tw-panel">
+            <div class="ol-tw-full-container">
+              <!-- Hàng 1: Banner Nhiệm vụ đọc SGK & Đồng hồ tĩnh -->
+              <div class="ol-top-banner">
+                <div class="ol-spotlight-card h2-theory-spotlight" id="h2-teacher-spotlight">
+                  <div class="ots-icon"><i class="fas fa-book-reader"></i></div>
+                  <div class="ots-info">
+                    <div class="ots-label">NHIỆM VỤ ĐỌC SGK & KHÁM PHÁ KIẾN THỨC MỚI:</div>
+                    <div class="ots-name" id="h2-theory-task-display">Đọc SGK mục 1 (trang 92-93), thảo luận theo cặp đôi về khái niệm xâu ký tự và quy tắc đánh chỉ số index trong Python.</div>
+                    <div class="h2-doc-link" id="h2-theory-doc-display" style="color:#38bdf8;font-size:13.5px;margin-top:5px;font-weight:600;">
+                      <i class="fas fa-bookmark" style="margin-right:6px;"></i> Tài liệu: SGK Tin học 10 Cánh Diều - Mục 1 Trang 92
+                    </div>
+                  </div>
+                  <div class="ots-timer-wrap">
+                    <span class="ots-timer" id="h2-timer-display">05:00</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hàng 2: Bàn điều khiển 4 nút tuần tự sư phạm Hoạt động 2 -->
+              <div class="ol-controls-card">
+                <div class="ol-sequential-actions">
+                  <button type="button" class="btn-seq-step btn-seq-1" id="btn-h2-step-1-task" onclick="window.h2AssignTask()">
+                    <i class="fas fa-clipboard-list"></i> 1. GIAO NHIỆM VỤ
+                  </button>
+                  <button type="button" class="btn-seq-step btn-seq-2 disabled" id="btn-h2-step-2-timer" disabled onclick="window.h2StartReading()">
+                    <i class="fas fa-stopwatch"></i> 2. BẮT ĐẦU ĐỌC & TÍNH GIỜ
+                  </button>
+                  <button type="button" class="btn-seq-step btn-seq-3 disabled" id="btn-h2-step-3-summary" disabled onclick="window.h2Summarize()">
+                    <i class="fas fa-lightbulb"></i> 3. CHỐT KIẾN THỨC
+                  </button>
+                  <button type="button" class="btn-seq-step btn-seq-4" id="btn-h2-step-4-waiting" onclick="window.h2FinishToLobby()">
+                    <i class="fas fa-undo"></i> 4. PHÒNG CHỜ
+                  </button>
+                </div>
+              </div>
+
+              <!-- Hàng 3: Khung xem trước Trạm kiến thức số NotebookLM 18 máy đang xem -->
+              <div class="ol-submissions-box h2-preview-box">
+                <div class="osb-header">
+                  <h4><i class="fas fa-desktop"></i> TRẠM LÝ THUYẾT NOTEBOOKLM TRÊN 18 MÁY</h4>
+                  <span class="osb-count" id="h2-reading-status">Trạng thái: 18/18 máy sẵn sàng</span>
+                </div>
+                <div class="h2-theory-preview-grid" id="h2-theory-preview-grid">
+                  <!-- Render động các thẻ kiến thức NotebookLM -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BƯỚC 3: BẢNG TÁC NGHIỆP THỰC HÀNH & THẢO LUẬN (100% WIDTH FULL VIEW) -->
+          <div id="tw-panel-discussion" class="tw-panel">
+            <div class="ol-tw-full-container">
+              <!-- Hàng 1: Banner Đề bài thực hành & Đồng hồ tĩnh -->
+              <div class="ol-top-banner">
+                <div class="ol-spotlight-card h3-disc-spotlight" id="h3-teacher-spotlight">
+                  <div class="ots-icon"><i class="fas fa-laptop-code"></i></div>
+                  <div class="ots-info">
+                    <div class="ots-label">NHIỆM VỤ THỰC HÀNH & THẢO LUẬN NHÓM ĐÔI:</div>
+                    <div class="ots-name" id="h3-disc-task-display">Thực hành vẽ và mô tả thuật toán bằng sơ đồ khối theo cặp đôi</div>
+                    <div id="h3-disc-meta-display" style="color:#a78bfa;font-size:13px;margin-top:4px;font-weight:600;">
+                      <i class="fas fa-code-branch"></i> Hỗ trợ nộp bài theo thời gian thực & Spotlight bài xuất sắc lên bảng
+                    </div>
+                  </div>
+                  <div class="ots-timer-wrap">
+                    <span class="ots-timer" id="h3-timer-display">10:00</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hàng 2: Bàn điều khiển 4 nút tuần tự sư phạm Hoạt động 3 -->
+              <div class="ol-controls-card">
+                <div class="ol-sequential-actions">
+                  <button type="button" class="btn-seq-step btn-seq-1" id="btn-h3-step-1-task" onclick="window.h3DeliverTask()">
+                    <i class="fas fa-scroll"></i> 1. PHÁT ĐỀ BÀI
+                  </button>
+                  <button type="button" class="btn-seq-step btn-seq-2 disabled" id="btn-h3-step-2-timer" disabled onclick="window.h3StartCoding()">
+                    <i class="fas fa-code"></i> 2. MỞ KHUNG LÀM BÀI & TÍNH GIỜ
+                  </button>
+                  <button type="button" class="btn-seq-step btn-seq-3 disabled" id="btn-h3-step-3-solution" disabled onclick="window.h3RevealSolution()">
+                    <i class="fas fa-bullseye"></i> 3. THU BÀI & CÔNG BỐ CODE MẪU
+                  </button>
+                  <button type="button" class="btn-seq-step btn-seq-4" id="btn-h3-step-4-waiting" onclick="window.h3FinishToLobby()">
+                    <i class="fas fa-undo"></i> 4. PHÒNG CHỜ
+                  </button>
+                </div>
+              </div>
+
+              <!-- Hàng 3: Danh sách bài nộp của 18 máy theo thời gian thực -->
+              <div class="ol-submissions-box">
+                <div class="osb-header">
+                  <h4><i class="fas fa-list-check"></i> BÀI LÀM THỰC HÀNH CỦA 18 MÁY THEO THỜI GIAN THỰC</h4>
+                  <span class="osb-count" id="disc-submitted-count">Đã nộp: 0/18 máy</span>
+                </div>
+                <div class="disc-submissions-list" id="disc-submissions-list">
+                  <!-- Render động bài nộp của 18 máy -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BƯỚC 4: BẢNG TÁC NGHIỆP ĐẤU TRƯỜNG KAHOOT & PODIUM 3D (100% WIDTH FULL VIEW) -->
+          <div id="tw-panel-quiz" class="tw-panel">
+            <div class="ol-tw-full-container">
+              <!-- Hàng 1: Banner Đấu trường & Đồng hồ tĩnh -->
+              <div class="ol-top-banner">
+                <div class="ol-spotlight-card h4-quiz-spotlight" id="h4-teacher-spotlight">
+                  <div class="ots-icon"><i class="fas fa-trophy"></i></div>
+                  <div class="ots-info">
+                    <div class="ots-label">ĐẤU TRƯỜNG TRẮC NGHIỆM THI ĐUA (CHỐNG NHÌN BÀI NHAU):</div>
+                    <div class="ots-name" id="h4-quiz-q-display">Trong Python, xâu ký tự có tính chất bất biến (immutable). Điều này có nghĩa là gì?</div>
+                    <div id="h4-quiz-correct-display" style="color:#34d399;font-size:13px;font-weight:700;margin-top:4px;">
+                      <i class="fas fa-check-circle"></i> Đáp án chuẩn: B. Không thể gán thay đổi trực tiếp từng ký tự trong xâu đã tạo
+                    </div>
+                  </div>
+                  <div class="ots-timer-wrap">
+                    <span class="ots-timer" id="h4-timer-display">00:20</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hàng 2: Bàn điều khiển 4 nút tuần tự sư phạm Hoạt động 4 -->
+              <div class="ol-controls-card">
+                <div class="ol-sequential-actions">
+                  <button type="button" class="btn-seq-step btn-seq-1" id="btn-h4-step-1-start" onclick="window.h4StartArena()">
+                    <i class="fas fa-shield-alt"></i> 1. KHỞI ĐỘNG ĐẤU TRƯỜNG
+                  </button>
+                  <button type="button" class="btn-seq-step btn-seq-2 disabled" id="btn-h4-step-2-timer" disabled onclick="window.h4DeliverQuiz()">
+                    <i class="fas fa-paper-plane"></i> 2. PHÁT ĐỀ & TÍNH GIỜ
+                  </button>
+                  <button type="button" class="btn-seq-step btn-seq-3 disabled" id="btn-h4-step-3-podium" disabled onclick="window.h4RevealPodium()">
+                    <i class="fas fa-trophy"></i> 3. CÔNG BỐ & BỤC VINH DANH
+                  </button>
+                  <button type="button" class="btn-seq-step btn-seq-4" id="btn-h4-step-4-waiting" onclick="window.h4FinishSession()">
+                    <i class="fas fa-flag-checkered"></i> 4. TỔNG KẾT TIẾT HỌC
+                  </button>
+                </div>
+              </div>
+
+              <!-- Hàng 3: Bảng xếp hạng trực tiếp 18 máy & Podium -->
+              <div class="ol-submissions-box">
+                <div class="osb-header">
+                  <h4><i class="fas fa-crown"></i> BẢNG XẾP HẠNG THI ĐUA 18 MÁY (LIVE LEADERBOARD)</h4>
+                  <span class="osb-count" id="quiz-submitted-count">Đã trả lời: 0/18 máy</span>
+                </div>
+                <div class="quiz-leaderboard" id="quiz-leaderboard">
+                  <!-- Bảng xếp hạng + Bục Podium 3D -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+      <!-- ===================================================
+           PHÂN HỆ 4: GIÁM SÁT PHÒNG MÁY THỜI GIAN THỰC (TAB MONITOR)
+      ==================================================== -->
+      <section id="teacher-panel-monitor" class="teacher-panel" style="display:none;">
+        <div class="panel-monitor-container">
+          <!-- Toolbar Điều Khiển Phòng Máy -->
+          <div class="mon-toolbar">
+            <div class="mon-toolbar-left">
+              <div class="mon-gateway-badge">
+                <span class="gateway-dot offline" id="mon-gateway-dot"></span>
+                <span class="gateway-label" id="mon-gateway-label">Đang kết nối Gateway Local...</span>
+                <button type="button" class="btn-mon-reconnect" id="btn-mon-reconnect" title="Thử kết nối lại Gateway">
+                  <i class="fas fa-sync-alt"></i>
+                </button>
+              </div>
+              <div class="mon-stats-group">
+                <div class="mon-stat-item">
+                  <span class="stat-label">Tổng máy:</span>
+                  <span class="stat-value" id="mon-stat-total">18</span>
+                </div>
+                <div class="mon-stat-item stat-online">
+                  <span class="stat-label">Online:</span>
+                  <span class="stat-value" id="mon-stat-online">0</span>
+                </div>
+                <div class="mon-stat-item stat-locked">
+                  <span class="stat-label">Đang khóa:</span>
+                  <span class="stat-value" id="mon-stat-locked">0</span>
+                </div>
+                <div class="mon-stat-item stat-uac">
+                  <span class="stat-label">Bảo mật UAC:</span>
+                  <span class="stat-value" id="mon-stat-uac">0</span>
+                </div>
+              </div>
+            </div>
+            <div class="mon-toolbar-right">
+              <button type="button" class="btn-mon-action btn-mon-broadcast" id="btn-mon-broadcast-start" title="Trình chiếu màn hình hoặc PowerPoint của Giáo viên đồng loạt xuống 18 máy học sinh kèm khóa cứng chuột và bàn phím">
+                <i class="fas fa-satellite-dish"></i> Chiếu màn hình Thầy (Khóa chuột/phím)
+              </button>
+              <button type="button" class="btn-mon-action btn-mon-broadcast-stop" id="btn-mon-broadcast-stop" title="Dừng trình chiếu bài giảng và mở khóa chuột/bàn phím học sinh ngay lập tức" style="display:none;">
+                <i class="fas fa-stop-circle"></i> Dừng chiếu bài giảng
+              </button>
+              <button type="button" class="btn-mon-action btn-mon-wol" id="btn-mon-wol-all" title="Bật nguồn toàn bộ 18 máy trạm bằng chuẩn IEEE 802.3 Wake-on-LAN">
+                <i class="fas fa-power-off"></i> Bật cả phòng (18 máy)
+              </button>
+              <button type="button" class="btn-mon-action btn-mon-lock" id="btn-mon-lock-all" title="Khóa màn hình và bàn phím toàn bộ 18 máy trạm để học sinh tập trung nghe giảng">
+                <i class="fas fa-lock"></i> Khóa cả phòng (18 máy)
+              </button>
+              <button type="button" class="btn-mon-action btn-mon-unlock" id="btn-mon-unlock-all" title="Mở khóa màn hình toàn bộ 18 máy để học sinh thực hành">
+                <i class="fas fa-unlock"></i> Mở khóa toàn phòng
+              </button>
+              <button type="button" class="btn-mon-action btn-mon-collect" id="btn-mon-collect-all" title="Thu gom toàn bộ file bài tập từ thư mục Desktop của 18 học sinh">
+                <i class="fas fa-file-download"></i> Thu bài cả phòng (18 máy)
+              </button>
+              <button type="button" class="btn-mon-action btn-mon-shutdown" id="btn-mon-shutdown-all" title="Tắt an toàn toàn bộ 18 máy trạm khi tan học">
+                <i class="fas fa-ban"></i> Tắt cả phòng (18 máy)
+              </button>
+              <button type="button" class="btn-mon-action btn-mon-restart" id="btn-mon-restart-all" title="Khởi động lại (Reset) toàn bộ 18 máy trạm phòng máy">
+                <i class="fas fa-sync-alt"></i> Khởi động lại (18 máy)
+              </button>
+              <button type="button" class="btn-mon-action btn-mon-net-block" id="btn-mon-block-net" title="Khóa toàn bộ mạng Internet WAN (Chỉ cho phép kết nối LMS nội bộ, chống mọi VPN/trình duyệt)">
+                <i class="fas fa-shield-alt"></i> Khóa Internet (Chỉ LMS)
+              </button>
+              <button type="button" class="btn-mon-action btn-mon-net-unblock" id="btn-mon-unblock-net" title="Mở lại toàn bộ mạng Internet cho học sinh" style="display:none;">
+                <i class="fas fa-globe"></i> Mở lại Internet
+              </button>
+            </div>
+          </div>
+
+          <!-- Lưới 18 Màn Hình Máy Trạm -->
+          <div class="monitor-grid-container" id="monitor-grid-container">
+            <!-- Render động 18 thẻ card bởi live_monitor.js -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </section>
+
+  <!-- =========================================================
+       MODAL: ĐĂNG NHẬP GIÁO VIÊN BẢO MẬT (SHA-256 ENCRYPTED)
+  ========================================================== -->
+  <div class="modal-overlay" id="modal-teacher-login" style="display:none;">
+    <div class="modal-card auth-card">
+      <div class="modal-header auth-header">
+        <div class="modal-icon auth-icon"><i class="fas fa-user-shield"></i></div>
+        <h3>ĐĂNG NHẬP GIÁO VIÊN</h3>
+        <p class="auth-sub">Bảo mật mã hóa SHA-256 • Chống xem trộm F12</p>
+      </div>
+      <form id="form-teacher-login" onsubmit="event.preventDefault(); window.submitTeacherLogin();">
+        <div class="form-group-auth">
+          <label for="teacher-password-input"><i class="fas fa-key"></i> Mật khẩu Giáo viên:</label>
+          <div class="pwd-input-wrap">
+            <input type="password" id="teacher-password-input" placeholder="Nhập mật khẩu quản trị..." autocomplete="current-password" required>
+            <button type="button" class="btn-toggle-pwd" id="btn-toggle-pwd" title="Hiện/ẩn mật khẩu">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="auth-hint">Mật khẩu mặc định: <code>admin123</code> hoặc <code>ThayKhang@2026</code></div>
+          <div class="auth-error-msg" id="auth-error-msg" style="display:none;">
+            <i class="fas fa-exclamation-circle"></i> Mật khẩu không chính xác. Vui lòng thử lại!
+          </div>
+        </div>
+        <div class="modal-actions" style="margin-top:20px;">
+          <button type="button" class="btn-cancel" id="btn-cancel-teacher-login">Hủy</button>
+          <button type="submit" class="btn-confirm"><i class="fas fa-sign-in-alt"></i> ĐĂNG NHẬP</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL: CÀI ĐẶT DANH SÁCH LỚP & SƠ ĐỒ 18 MÁY (EXCEL IMPORT/EXPORT)
+  ========================================================== -->
+  <div class="modal-overlay modal-xl" id="modal-teacher-settings" style="display:none;">
+    <div class="modal-card settings-card">
+      <div class="modal-header settings-header">
+        <div class="sh-left">
+          <div class="modal-icon settings-icon"><i class="fas fa-sliders-h"></i></div>
+          <div>
+            <h3>CÀI ĐẶT HỌC SINH & SƠ ĐỒ 18 MÁY</h3>
+            <p class="auth-sub">Quản lý danh sách học sinh theo từng lớp • Nhập/Xuất file Excel có cột Lớp học • Hỗ trợ linh hoạt 1-4 học sinh/máy</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" id="btn-close-settings" title="Đóng cài đặt">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="settings-toolbar">
+        <div class="st-group">
+          <label for="settings-select-class"><i class="fas fa-users"></i> Lớp học:</label>
+          <select id="settings-select-class" class="th-select">
+            <option value="6A1">Lớp 6A1</option>
+            <option value="6A2">Lớp 6A2</option>
+            <option value="7A1">Lớp 7A1</option>
+            <option value="8A1">Lớp 8A1</option>
+            <option value="9A1">Lớp 9A1</option>
+          </select>
+          <button type="button" class="btn-tool-sm" id="btn-add-new-class-modal" title="Thêm lớp học mới">
+            <i class="fas fa-plus-circle"></i> Thêm lớp mới
+          </button>
+          <span class="badge-total-students" id="settings-student-count-badge">37 học sinh / 18 máy</span>
+        </div>
+
+        <div class="st-actions">
+          <button type="button" class="btn-action-excel" id="btn-download-excel-template" title="Tải file Excel mẫu về máy để điền danh sách">
+            <i class="fas fa-file-excel"></i> Tải file mẫu Excel
+          </button>
+          <label class="btn-action-excel btn-import-label" title="Chọn file Excel hoặc CSV từ máy tính để nhập vào sơ đồ">
+            <i class="fas fa-file-upload"></i> Nhập từ Excel/CSV
+            <input type="file" id="input-excel-file" accept=".xlsx, .xls, .csv" style="display:none;">
+          </label>
+          <button type="button" class="btn-action-excel" id="btn-export-current-excel" title="Xuất danh sách sơ đồ lớp này ra file Excel">
+            <i class="fas fa-file-download"></i> Xuất Excel
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-hint-box">
+        <i class="fas fa-info-circle"></i>
+        <span>Hệ thống hỗ trợ linh hoạt <strong>1, 2, 3 hoặc 4 học sinh/máy</strong>. Thầy có thể bấm <strong>[+ Thêm học sinh]</strong> ở từng máy bên dưới hoặc tải file Excel mẫu về chỉnh sửa rồi nạp lên.</span>
+      </div>
+
+      <!-- Lưới 18 máy có thể thao tác trực tiếp -->
+      <div class="settings-seating-grid" id="settings-seating-grid">
+        <!-- Render động 18 ô máy với danh sách học sinh -->
+      </div>
+
+      <div class="settings-footer">
+        <div class="sf-left">
+          <button type="button" class="btn-tool" id="btn-reset-default-class-data" title="Khôi phục lại danh sách lớp ban đầu">
+            <i class="fas fa-undo"></i> Khôi phục mặc định
+          </button>
+        </div>
+        <div class="sf-right">
+          <button type="button" class="btn-cancel" id="btn-cancel-settings">Đóng</button>
+          <button type="button" class="btn-confirm" id="btn-save-settings">
+            <i class="fas fa-save"></i> LƯU THAY ĐỔI VÀ ĐỒNG BỘ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL: BỐC THĂM GỌI HỌC SINH KỊCH TÍNH (2 PHƯƠNG ÁN A/B)
+  ========================================================== -->
+  <div class="modal-overlay modal-xl" id="modal-lucky-draw" style="display:none;">
+    <div class="modal-card lucky-draw-card arcade-theme">
+      <!-- Dải đèn Arcade Neon nhấp nháy -->
+      <div class="arcade-neon-bar">
+        <span class="neon-dot gold"></span>
+        <span class="neon-dot cyan"></span>
+        <span class="neon-dot magenta"></span>
+        <span class="arcade-title-mini">LMS ARCADE LUCKY WHEEL</span>
+        <span class="neon-dot magenta"></span>
+        <span class="neon-dot cyan"></span>
+        <span class="neon-dot gold"></span>
+      </div>
+
+      <div class="modal-header ld-header">
+        <div class="ldh-left">
+          <div class="modal-icon ld-icon"><i class="fas fa-dice"></i></div>
+          <div>
+            <h3>BỐC THĂM GỌI HỌC SINH KIỂM TRA BÀI CŨ</h3>
+            <p class="auth-sub">Cú đúp hồi hộp 2 tầng: Chọn Máy ➔ Chọn Đích danh 1 Học sinh • Đồng bộ 18 máy</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" id="btn-close-lucky-draw" onclick="window.closeLuckyDrawModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Thanh chọn phương án (A: Trục lăn Ma trận / B: Chiếc nón kỳ diệu) -->
+      <div class="ld-strategy-selector">
+        <span class="ld-strat-label"><i class="fas fa-magic"></i> Chế độ hiệu ứng:</span>
+        <div class="ld-strat-pills">
+          <button type="button" class="ld-strat-btn active" id="btn-strat-slot" onclick="window.setLuckyDrawStrategy('slot_machine')">
+            <i class="fas fa-bars"></i> Phương án A: Trục Lăn Ma Trận (Blooket / Quizizz)
+          </button>
+          <button type="button" class="ld-strat-btn" id="btn-strat-wheel" onclick="window.setLuckyDrawStrategy('wheel_fortune')">
+            <i class="fas fa-dharmachakra"></i> Phương án B: Chiếc Nón Kỳ Diệu
+          </button>
+        </div>
+      </div>
+
+      <!-- Sân khấu quay số trung tâm -->
+      <div class="ld-stage-container">
+        <!-- Vùng hiển thị Phương án A: Trục Lăn Ma Trận -->
+        <div class="ld-view-slot" id="ld-view-slot">
+          <div class="slot-arcade-cabinet">
+            <div class="slot-machine-wrapper">
+              <!-- Cột 1: Chọn Số Máy -->
+              <div class="slot-column slot-col-machine">
+                <div class="slot-col-title"><i class="fas fa-desktop"></i> TẦNG 1: 18 MÁY PHÒNG HỌC</div>
+                <div class="slot-window">
+                  <div class="slot-cylinder-overlay"></div>
+                  <div class="slot-reel" id="slot-reel-machine">
+                    <!-- Render động các số máy kèm icon -->
+                  </div>
+                  <div class="slot-pointer"></div>
+                </div>
+              </div>
+
+              <!-- Cột 2: Chọn Đích Danh Học Sinh Trong Máy -->
+              <div class="slot-column slot-col-student">
+                <div class="slot-col-title"><i class="fas fa-user-graduate"></i> TẦNG 2: HỌC SINH TẠI MÁY</div>
+                <div class="slot-window">
+                  <div class="slot-cylinder-overlay"></div>
+                  <div class="slot-reel" id="slot-reel-student">
+                    <!-- Render động tên học sinh kèm số máy -->
+                  </div>
+                  <div class="slot-pointer"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vùng hiển thị Phương án B: Chiếc Nón Kỳ Diệu (Canvas Wheel) -->
+        <div class="ld-view-wheel" id="ld-view-wheel" style="display:none;">
+          <div class="wheel-stage-wrapper">
+            <!-- HUD Trực tiếp quét 18 máy & học sinh khi quay -->
+            <div class="wheel-live-tracker" id="wheel-live-tracker">
+              <span class="wlt-badge"><i class="fas fa-crosshairs"></i> VỊ TRÍ ĐANG QUÉT:</span>
+              <span class="wlt-desk" id="wlt-desk-text">MÁY 01</span>
+              <span class="wlt-arrow">➔</span>
+              <span class="wlt-student" id="wlt-student-text">Sẵn sàng quay 18 máy...</span>
+            </div>
+
+            <div class="wheel-outer-box">
+              <div class="wheel-pointer-arrow" id="wheel-pointer-arrow">
+                <div class="wpa-needle"></div>
+              </div>
+              <canvas id="wheel-canvas" width="440" height="440"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banner Chúc mừng Kết quả bùng nổ (Chuẩn Wordwall / Blooket Celebration) -->
+        <div class="ld-result-banner" id="ld-result-banner" style="display:none;">
+          <div class="lrb-podium-card">
+            <div class="lrb-badge"><i class="fas fa-crown"></i> HỌC SINH ĐÃ ĐƯỢC CHỌN LÊN BẢNG!</div>
+            <div class="lrb-machine" id="lrb-machine-text">MÁY 03</div>
+            <div class="lrb-student" id="lrb-student-text">Em: Hoàng Kim Ngân</div>
+            <div class="lrb-sub-hint"><i class="fas fa-chalkboard-teacher"></i> Chuẩn bị tinh thần trả lời câu hỏi của Thầy</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ld-footer">
+        <div class="ld-footer-left">
+          <span class="ld-sound-status"><i class="fas fa-volume-up"></i> Âm thanh Web Audio chân thực</span>
+        </div>
+        <div class="ld-footer-right">
+          <div class="ld-student-badge-view" id="ld-student-badge-view" style="display:none;color:#38bdf8;font-weight:700;font-size:14px;padding:8px 16px;background:rgba(56,189,248,0.15);border-radius:8px;border:1px solid #38bdf8;">
+            <i class="fas fa-satellite-dish"></i> ĐANG XEM BỐC THĂM TỪ BÀN ĐIỀU KHIỂN CỦA THẦY...
+          </div>
+          <button type="button" class="btn-cancel" id="btn-cancel-lucky-draw" onclick="window.closeLuckyDrawModal()">Đóng</button>
+          <button type="button" class="btn-confirm btn-lg" id="btn-trigger-spin" onclick="window.startLuckyDrawSpin()">
+            <i class="fas fa-play"></i> BẮT ĐẦU QUAY SỐ (ĐỒNG BỘ 18 MÁY)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       OVERLAY: ĐẾM NGƯỢC ĐỒNG BỘ 3-2-1 TOÀN MÀN HÌNH (CHUẨN KAHOOT)
+  ========================================================== -->
+  <div id="activity-countdown-overlay" class="activity-countdown-overlay" style="display:none;" onclick="this.style.display='none';" title="Nhấp để đóng">
+    <div class="acd-glow"></div>
+    <div class="acd-box">
+      <div class="acd-activity-tag"><i class="fas fa-bolt"></i> CHUẨN BỊ BƯỚC VÀO</div>
+      <div class="acd-title" id="acd-activity-name">BƯỚC 1: KIỂM TRA BÀI CŨ</div>
+      <div class="acd-circle">
+        <div class="acd-number" id="acd-number">3</div>
+      </div>
+      <div class="acd-sub">HÃY HƯỚNG MẮT LÊN MÀN HÌNH ĐẤU TRƯỜNG!</div>
+    </div>
+  </div>
+
+  <!-- MODAL: CHẶN CỨNG TUYỆT ĐỐI KHI CHƯA CÓ HỌC SINH NÀO TRONG PHÒNG CHỜ (0/18 MÁY) -->
+  <div class="modal-overlay" id="modal-zero-student-alert" style="display:none;z-index:999999;">
+    <div class="modal-card" style="max-width:540px;text-align:center;border:2px solid #ef4444;box-shadow:0 0 50px rgba(239,68,68,0.45);background:linear-gradient(145deg,#1e1b2e 0%,#0f172a 100%);">
+      <div style="font-size:48px;color:#ef4444;margin-bottom:12px;filter:drop-shadow(0 0 15px rgba(239,68,68,0.6));">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h3 style="font-size:20px;color:#f8fafc;margin-bottom:8px;font-weight:800;letter-spacing:0.5px;">
+        CHƯA CÓ HỌC SINH TRONG PHÒNG CHỜ!
+      </h3>
+      <p style="color:#cbd5e1;font-size:14px;line-height:1.6;margin-bottom:20px;">
+        Hiện tại chưa có máy học sinh nào kết nối vào phòng chờ (<strong>0/18 máy</strong>).<br>
+        Thầy vui lòng nhắc nhở học sinh mở máy và đăng nhập vào phòng chờ trước khi phát lệnh bắt đầu hoạt động!
+      </p>
+      <div style="display:flex;justify-content:center;">
+        <button type="button" class="btn-confirm" id="btn-close-zero-student-alert" onclick="window.closeZeroStudentAlert()" style="background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:none;padding:12px 28px;font-size:14px;font-weight:800;border-radius:10px;box-shadow:0 0 20px rgba(239,68,68,0.4);cursor:pointer;">
+          <i class="fas fa-bullhorn"></i> ĐÃ HIỂU — ĐỂ THẦY NHẮC NHỞ HỌC SINH
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CẢNH BÁO SĨ SỐ PHÒNG CHỜ (KHI CÒN MÁY CHƯA VÀO) -->
+  <div class="modal-overlay" id="modal-waiting-room-alert" style="display:none;z-index:99999;">
+    <div class="modal-card" style="max-width:560px;text-align:center;border:2px solid #f59e0b;box-shadow:0 0 40px rgba(245,158,11,0.35);">
+      <div style="font-size:44px;color:#f59e0b;margin-bottom:12px;">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3 style="font-size:20px;color:#f8fafc;margin-bottom:8px;font-weight:800;" id="wra-title">
+        CẢNH BÁO: CHƯA ĐỦ 18 MÁY VÀO PHÒNG CHỜ!
+      </h3>
+      <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-bottom:16px;" id="wra-desc">
+        Hiện có <strong style="color:#f59e0b;" id="wra-missing-count">0</strong> máy chưa vào phòng chờ. Thầy có muốn nhắc nhở các em chọn máy trước khi bắt đầu hoạt động?
+      </p>
+      <div style="background:rgba(15,23,42,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;margin-bottom:20px;">
+        <div style="font-size:12px;color:#cbd5e1;font-weight:700;margin-bottom:8px;">CÁC MÁY CHƯA VÀO PHÒNG CHỜ:</div>
+        <div id="wra-missing-list" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
+          <!-- Render danh sách chip máy còn thiếu -->
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button type="button" class="btn-cancel" id="btn-wra-wait" onclick="window.closeWaitingRoomAlert(false)" style="padding:10px 20px;font-size:14px;font-weight:700;">
+          <i class="fas fa-hourglass-half"></i> Để Thầy nhắc nhở (Đợi)
+        </button>
+        <button type="button" class="btn-confirm" id="btn-wra-proceed" onclick="window.closeWaitingRoomAlert(true)" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;padding:10px 20px;font-size:14px;font-weight:700;">
+          <i class="fas fa-play"></i> Vẫn bắt đầu hoạt động
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: XEM TRƯỚC KỊCH BẢN BÀI DẠY SƯ PHẠM DẠNG BẢNG CHI TIẾT (THAY THẾ BROWSER ALERT) -->
+  <div class="modal-overlay modal-xl" id="modal-studio-preview" style="display:none;z-index:999999;">
+    <div class="modal-card blueprint-preview-card" style="max-width:1150px;width:95vw;max-height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden;border:1px solid rgba(56,189,248,0.4);box-shadow:0 0 50px rgba(14,165,233,0.25);">
+      <div class="blueprint-modal-header" style="padding:16px 24px;background:linear-gradient(135deg,#0f172a,#1e293b);border-bottom:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#0284c7,#38bdf8);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 0 15px rgba(56,189,248,0.4);">
+            <i class="fas fa-sitemap"></i>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#38bdf8;text-transform:uppercase;letter-spacing:1px;">BẢN ĐỒ TIẾN TRÌNH SƯ PHẠM CHI TIẾT (LESSON BLUEPRINT)</div>
+            <h3 id="bp-modal-title" style="margin:2px 0 0 0;font-size:18px;font-weight:800;color:#f8fafc;">Bài 12: Thuật toán và sơ đồ khối trong Tin học 6</h3>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div class="bp-summary-tags" id="bp-summary-tags" style="display:flex;gap:8px;">
+            <!-- Render badges -->
+          </div>
+          <button type="button" class="btn-tool" onclick="window.closeStudioPreviewModal()" style="width:34px;height:34px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#cbd5e1;cursor:pointer;">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="blueprint-modal-body" style="padding:20px;overflow-y:auto;flex:1;background:#090d16;">
+        <div class="blueprint-table-wrap" id="blueprint-table-container">
+          <!-- Render dynamic Blueprint Table -->
+        </div>
+      </div>
+      <div class="blueprint-modal-footer" style="padding:14px 24px;background:#0f172a;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:13px;color:#94a3b8;">
+          <i class="fas fa-info-circle" style="color:#38bdf8;"></i> Mọi hoạt động đều tuân thủ <strong>Chu trình 4 nút tuần tự</strong> trên bàn điều khiển Sân khấu.
+        </div>
+        <div style="display:flex;gap:12px;">
+          <button type="button" class="btn-cancel" id="btn-close-blueprint-preview" onclick="window.closeStudioPreviewModal()" style="padding:9px 18px;font-size:13.5px;font-weight:700;">
+            <i class="fas fa-times"></i> Đóng lại
+          </button>
+          <button type="button" class="btn-primary" id="btn-bp-apply-save" onclick="window.studioSaveFromPreview()" style="background:linear-gradient(135deg,#059669,#10b981);padding:9px 20px;font-size:13.5px;font-weight:700;border:none;border-radius:8px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 0 15px rgba(16,185,129,0.35);">
+            <i class="fas fa-save"></i> ÁP DỤNG & LƯU KỊCH BẢN
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CHIẾU MÀN HÌNH SPOTLIGHT FULL HD LÊN BẢNG / MÁY CHIẾU -->
+  <div class="modal-overlay modal-spotlight-overlay" id="modal-monitor-spotlight" style="display:none;">
+    <div class="modal-card spotlight-card">
+      <div class="spotlight-header">
+        <div class="spotlight-title-group">
+          <div class="spotlight-badge"><i class="fas fa-bullhorn"></i> SPOTLIGHT STAGE</div>
+          <h3 id="spotlight-modal-title">CHIẾU MÀN HÌNH HỌC SINH</h3>
+          <p id="spotlight-modal-sub">Học sinh: Đang nạp... • Độ phân giải: 1280x720 15 FPS</p>
+        </div>
+        <div class="spotlight-actions">
+          <button type="button" class="btn-tool" id="btn-spotlight-lock" title="Khóa máy này"><i class="fas fa-lock"></i> Khóa máy</button>
+          <button type="button" class="btn-tool" id="btn-spotlight-unlock" title="Mở khóa máy này"><i class="fas fa-unlock"></i> Mở khóa</button>
+          <button type="button" class="btn-tool" id="btn-spotlight-collect" title="Thu bài máy này"><i class="fas fa-file-download"></i> Thu bài</button>
+          <button type="button" class="btn-tool btn-tool-danger" id="btn-close-spotlight-modal" title="Thoát chế độ Spotlight"><i class="fas fa-times"></i> Đóng</button>
+        </div>
+      </div>
+      <div class="spotlight-body">
+        <canvas id="modal-spotlight-canvas" class="spotlight-canvas" width="1280" height="720"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST: CHUYỂN CẢNH SƯ PHẠM MƯỢT MÀ 1.5S (FADE-OUT TRÁNH VỀ ĐỘT NGỘT) -->
+  <div id="activity-finishing-toast" class="activity-finishing-toast" style="display:none;">
+    <div class="aft-content">
+      <div class="aft-spinner"><i class="fas fa-check-circle"></i></div>
+      <div class="aft-text">
+        <h4 id="aft-title">HOÀN THÀNH HOẠT ĐỘNG!</h4>
+        <p id="aft-desc">Đang lưu dữ liệu và chuyển về phòng chờ...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL: THÔNG TIN TÁC GIẢ & BẢN QUYỀN HỆ THỐNG CVALMS
+  ========================================================== -->
+  <div class="modal-overlay" id="modal-author-info" style="display:none;">
+    <div class="modal-card author-card" style="max-width:540px;background:#0f172a;border:1px solid #38bdf8;border-radius:20px;padding:28px;box-shadow:0 0 35px rgba(56,189,248,0.35);color:#f8fafc;position:relative;">
+      <button type="button" class="btn-close-modal" id="btn-close-author-modal" title="Đóng" style="position:absolute;top:18px;right:18px;background:rgba(255,255,255,0.1);border:none;color:#94a3b8;font-size:18px;width:36px;height:36px;border-radius:50%;cursor:pointer;">
+        <i class="fas fa-times"></i>
+      </button>
+      <div style="text-align:center;margin-bottom:20px;">
+        <img src="assets/icons/app.ico" alt="CVALMS Brand Logo" style="width:72px;height:72px;border-radius:18px;box-shadow:0 0 20px rgba(56,189,248,0.6);margin-bottom:12px;">
+        <h3 style="font-size:20px;font-weight:900;color:#38bdf8;letter-spacing:1px;margin:0 0 4px 0;">CVALMS - LMS PHÒNG MÁY TƯƠNG TÁC</h3>
+        <p style="font-size:13px;color:#94a3b8;margin:0;">Phiên bản v3.5.0 Enterprise • Chuẩn GDPT 2018</p>
+      </div>
+      <div style="background:rgba(30,41,59,0.7);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.08);margin-bottom:18px;font-size:14px;line-height:1.7;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:6px;">
+          <span style="color:#94a3b8;"><i class="fas fa-user-graduate" style="color:#f59e0b;margin-right:6px;"></i> Tác giả:</span>
+          <strong style="color:#f8fafc;">Thầy Hà Văn Tý</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:6px;">
+          <span style="color:#94a3b8;"><i class="fas fa-school" style="color:#38bdf8;margin-right:6px;"></i> Đơn vị:</span>
+          <strong style="color:#f8fafc;">Trường THCS Chu Văn An</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:6px;">
+          <span style="color:#94a3b8;"><i class="fas fa-map-marker-alt" style="color:#10b981;margin-right:6px;"></i> Cơ quan chủ quản:</span>
+          <strong style="color:#f8fafc;">Sở GD&ĐT Quảng Ngãi</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:#94a3b8;"><i class="fas fa-shield-alt" style="color:#a855f7;margin-right:6px;"></i> Bản quyền:</span>
+          <strong style="color:#38bdf8;">© 2026 Thầy Hà Văn Tý. All rights reserved.</strong>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.6;background:rgba(15,23,42,0.6);border-radius:10px;padding:12px;border-left:3px solid #38bdf8;">
+        <p style="margin:0 0 6px 0;"><strong style="color:#f8fafc;"><i class="fas fa-microchip"></i> ĐẶC TÍNH KỸ THUẬT NỔI BẬT:</strong></p>
+        <ul style="margin:0;padding-left:18px;">
+          <li>Khởi động cứng 3 tầng bất biến (Registry + Startup + Task Scheduler).</li>
+          <li>Bảo mật mTLS chứng thực hai chiều chuẩn X.509.</li>
+          <li>Đánh thức từ xa Wake-on-LAN (IEEE 802.3) & Tắt / Khởi động lại 18 máy.</li>
+          <li>Watchdog Timer 15s tự động giải phóng chuột/phím chống kẹt máy học sinh.</li>
+          <li>Thu gom bài tập đóng gói SHA-256 toàn vẹn dữ liệu.</li>
+        </ul>
+      </div>
+      <div style="text-align:center;margin-top:20px;">
+        <button type="button" id="btn-author-understood" style="background:linear-gradient(135deg,#0284c7,#0369a1);border:none;color:#ffffff;font-weight:700;padding:10px 24px;border-radius:10px;cursor:pointer;box-shadow:0 4px 15px rgba(2,132,199,0.4);">
+          <i class="fas fa-check"></i> Đã hiểu & Tiếp tục
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SheetJS để xuất nhập file Excel chuyên nghiệp -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.mini.min.js"></script>
+
+  <!-- Firebase Compat v9 (Offline resilient) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- Standalone Script Chạy Độc Lập Chống Lỗi CORS (v3.5.0 Cache-Busted) -->
+  <script src="js/bundle.js?v=3.5.0"></script>
+
+  <!-- Live Lab Monitor (Giám Sát Phòng Máy 18 Máy) -->
+  <script src="js/live_monitor.js?v=3.5.0"></script>
+</body>
+</html>
+
+
+

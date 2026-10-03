@@ -1,0 +1,2 @@
+{"commandId":"cmd_9749f217-94f5-4595-84aa-ba5d6d51a110","action":"CLASSROOM_FOCUS_LOCK","target":"ALL","issuedAt":1789998108629,"sessionEpochId":"07d2d5e2-0d54-4689-8194-57fe53099550","issuedBy":"Teacher-Gateway-Localhost","loggedAt":1789998108629,"isoTime":"2026-09-21T13:41:48.629Z"}
+{"commandId":"cmd_bae0245b-1f3d-4bff-a5f2-9e2e781acf56","action":"CLASSROOM_FOCUS_UNLOCK","target":"ALL","issuedAt":1789998108633,"sessionEpochId":"07d2d5e2-0d54-4689-8194-57fe53099550","issuedBy":"Teacher-Gateway-Localhost","loggedAt":1789998108633,"isoTime":"2026-09-21T13:41:48.633Z"}

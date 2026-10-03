@@ -1,0 +1,20 @@
+{
+  "version": "1.1.0",
+  "releaseDate": "2026-10-03",
+  "package": "cvalms_client_patch_v1.1.0.zip",
+  "packageSize": 99338380,
+  "sha256": "6a3832ca89462f952076a521a31640ef0a7f2918f3f1c528a649e43feabb1863",
+  "binaries": {
+    "CvaLmsAgent.exe": {
+      "sha256": "9f306e25d1e17f3b3658f8246c1393ce702c51062abf8363e542c6d3c5d8c6a7"
+    },
+    "CvaLmsService.exe": {
+      "sha256": "dbbb374875766d99dd48091deadb8a3b1989afedbc78256ecc2bef312c3d09a5"
+    }
+  },
+  "changelog": [
+    "Vá triệt để rò rỉ bộ nhớ GDI+ và stream lifetime crash khi chiếu bài giảng",
+    "Bổ sung màn hình khóa Multi-Monitor và chặn tổ hợp phím Ctrl+Shift+Esc",
+    "Kiến trúc Windows Service SYSTEM quản trị Firewall và Watchdog"
+  ]
+}

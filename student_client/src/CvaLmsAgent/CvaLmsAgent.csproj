@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+
+    <!-- Biểu tượng thương hiệu Windows Icon -->
+    <ApplicationIcon>app.ico</ApplicationIcon>
+
+    <!-- Thông tin Tác giả, Bản quyền & Metadata hệ thống -->
+    <Version>8.5.0</Version>
+    <AssemblyVersion>8.5.0.0</AssemblyVersion>
+    <FileVersion>8.5.0.0</FileVersion>
+    <Product>CVALMS - Hệ Thống LMS Phòng Máy Tương Tác</Product>
+    <Description>Agent giám sát và điều khiển phòng máy trường học (18 máy song hành)</Description>
+    <Company>Trường THCS Chu Văn An - Sở GD&amp;ĐT Quảng Ngãi</Company>
+    <Authors>Thầy Hà Văn Tý - Sở GD&amp;ĐT Quảng Ngãi</Authors>
+    <Copyright>© 2026 Thầy Hà Văn Tý &amp; CVALMS Team. All rights reserved.</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,15 @@
+[
+  {
+    "submissionId": "bench_sub_1789998108350",
+    "machineId": "MAY-01",
+    "studentName": "NguyenVanA",
+    "expectedHash": "5dcb6da0249b14402a29be22b81cc886a6d4544eea72ef3edfe37c9516265318",
+    "sessionEpochId": "bench-epoch",
+    "state": "COMMITTED",
+    "createdAt": 1789998108350,
+    "committedAt": 1789998108456,
+    "savedFile": "MAY-01_NguyenVanA_2026-09-21T13-41-48.zip",
+    "fileSize": 48,
+    "contentHash": "5dcb6da0249b14402a29be22b81cc886a6d4544eea72ef3edfe37c9516265318"
+  }
+]
