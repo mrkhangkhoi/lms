@@ -3,7 +3,18 @@
  * Orchestrates Curriculum, Stepper, YouTube Embeds, Images, Anti-Skipping & Teacher PIN Gate
  */
 
-const sanitizeHTML = (h) => (typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(h) : h);
+const sanitizeHTML = (h) => {
+  if (typeof SelfStudyMedia !== 'undefined' && typeof SelfStudyMedia.sanitizeMediaContent === 'function') {
+    return SelfStudyMedia.sanitizeMediaContent(h);
+  }
+  if (typeof DOMPurify !== 'undefined') {
+    return DOMPurify.sanitize(h, {
+      ADD_TAGS: ['iframe', 'video', 'source'],
+      ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'referrerpolicy', 'controls', 'controlslist', 'preload']
+    });
+  }
+  return h;
+};
 
 // Audio Synthesis Engine (Zero dependencies, pure Web Audio API)
 function playSound(type) {
@@ -135,6 +146,10 @@ function parseYouTubeId(url) {
 function renderMediaMarkup(media) {
   if (!media || media.type === 'none' || !media.url) {
     return '';
+  }
+
+  if (typeof SelfStudyMedia !== 'undefined' && typeof SelfStudyMedia.renderMediaHtml === 'function') {
+    return SelfStudyMedia.renderMediaHtml(media);
   }
 
   const ytId = parseYouTubeId(media.url);
@@ -431,7 +446,11 @@ window.proceedToStep = function(nextStep) {
 };
 
 function updateStepperState() {
-  for (let s = 1; s <= 4; s++) {
+  const totalSteps = (engine.currentLesson && Array.isArray(engine.currentLesson.sections) && engine.currentLesson.sections.length > 0)
+    ? engine.currentLesson.sections.length
+    : 4;
+
+  for (let s = 1; s <= totalSteps; s++) {
     const tabBtn = document.getElementById(`tabStep${s}`);
     const tabNum = document.getElementById(`tabNum${s}`);
     if (!tabBtn || !tabNum) continue;
@@ -456,7 +475,7 @@ function updateStepperState() {
 
   // Calculate Progress Percent
   const completedCount = engine.completedSteps.size;
-  const pct = Math.round((completedCount / 4) * 100);
+  const pct = Math.min(100, Math.round((completedCount / totalSteps) * 100));
   const pBar = document.getElementById('progressBar');
   const pPct = document.getElementById('progressPercent');
   if (pBar) pBar.style.width = `${pct}%`;
@@ -1144,6 +1163,9 @@ function saveFormToEditor() {
     sections: [{ heading: 'Nội dung', content: step2Raw }]
   };
   editor.currentLesson.step3_notebook = { title: 'Kiến Thức Cốt Lõi', points: step3Items };
+  if (typeof editor.normalizeLessonToSections === 'function') {
+    editor.currentLesson = editor.normalizeLessonToSections(editor.currentLesson);
+  }
 }
 
 const btnSaveLAN = document.getElementById('btnSaveLAN');
@@ -1200,6 +1222,58 @@ if (btnNew) {
     const blank = editor.createNewLesson();
     populateEditorForm(blank);
     showToast('Đã tạo phôi bài học mới', 'fa-plus');
+  });
+}
+
+// Media Pre-flight Validator in Teacher Studio
+const btnTestMedia = document.getElementById('btnTestMedia');
+const btnCloseMediaPreview = document.getElementById('btnCloseMediaPreview');
+const mediaPreviewWrapper = document.getElementById('mediaPreviewWrapper');
+const mediaPreviewContainer = document.getElementById('mediaPreviewContainer');
+const mediaFeedback = document.getElementById('mediaFeedback');
+const editMediaUrlInput = document.getElementById('editMediaUrl');
+
+if (btnTestMedia) {
+  btnTestMedia.addEventListener('click', () => {
+    const url = (editMediaUrlInput ? editMediaUrlInput.value : '').trim();
+    if (!url) {
+      if (mediaFeedback) {
+        mediaFeedback.style.display = 'block';
+        mediaFeedback.style.color = 'var(--accent-red)';
+        mediaFeedback.innerHTML = sanitizeHTML('<i class="fa-solid fa-circle-exclamation"></i> Vui lòng dán link video vào ô trước khi kiểm tra.');
+      }
+      return;
+    }
+
+    const val = typeof SelfStudyMedia !== 'undefined'
+      ? SelfStudyMedia.validateMediaUrl(url)
+      : { ok: true, embedUrl: url, message: 'Đường dẫn hợp lệ' };
+
+    if (mediaFeedback) {
+      mediaFeedback.style.display = 'block';
+      if (val.ok) {
+        mediaFeedback.style.color = 'var(--accent-green)';
+        mediaFeedback.innerHTML = sanitizeHTML(`<i class="fa-solid fa-circle-check"></i> ${val.message}`);
+      } else {
+        mediaFeedback.style.color = 'var(--accent-red)';
+        mediaFeedback.innerHTML = sanitizeHTML(`<i class="fa-solid fa-circle-xmark"></i> ${val.message}`);
+      }
+    }
+
+    if (val.ok && mediaPreviewWrapper && mediaPreviewContainer) {
+      const renderFn = typeof SelfStudyMedia !== 'undefined' ? SelfStudyMedia.renderMediaHtml : renderMediaMarkup;
+      mediaPreviewContainer.innerHTML = sanitizeHTML(renderFn({ type: 'video', url }));
+      mediaPreviewWrapper.style.display = 'block';
+    } else if (mediaPreviewWrapper) {
+      mediaPreviewWrapper.style.display = 'none';
+    }
+  });
+}
+
+if (btnCloseMediaPreview && mediaPreviewWrapper) {
+  btnCloseMediaPreview.addEventListener('click', () => {
+    mediaPreviewWrapper.style.display = 'none';
+    if (mediaPreviewContainer) mediaPreviewContainer.textContent = '';
   });
 }
 

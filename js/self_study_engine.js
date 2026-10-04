@@ -86,7 +86,16 @@ class SelfStudyEngine {
   }
 
   loadLesson(lessonData) {
-    this.currentLesson = lessonData;
+    if (lessonData && typeof lessonData === 'object' && !Array.isArray(lessonData.sections)) {
+      if (typeof SelfStudyEditor !== 'undefined' && SelfStudyEditor.prototype && typeof SelfStudyEditor.prototype.normalizeLessonToSections === 'function') {
+        const editorHelper = new SelfStudyEditor();
+        this.currentLesson = editorHelper.normalizeLessonToSections(lessonData);
+      } else {
+        this.currentLesson = lessonData;
+      }
+    } else {
+      this.currentLesson = lessonData;
+    }
     this.unlockedStep = 1;
     this.completedSteps = new Set();
     this.userAnswers = {
@@ -206,7 +215,10 @@ class SelfStudyEngine {
 
   completeStep(step) {
     this.completedSteps.add(step);
-    if (step + 1 <= 4 && this.unlockedStep <= step) {
+    const maxSteps = (this.currentLesson && Array.isArray(this.currentLesson.sections) && this.currentLesson.sections.length > 0)
+      ? this.currentLesson.sections.length
+      : 4;
+    if (step + 1 <= maxSteps && this.unlockedStep <= step) {
       this.unlockedStep = step + 1;
     }
     this.saveProgressLocal();

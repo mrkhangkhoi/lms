@@ -400,15 +400,32 @@ Mô tả thuật toán bằng sơ đồ khối..."></textarea>
             <div class="form-group">
               <label class="form-label">Loại đa phương tiện (Media chính):</label>
               <select id="editMediaType" class="form-select">
-                <option value="video">Video (YouTube / MP4)</option>
+                <option value="video">Video (YouTube / Google Drive / MP4)</option>
                 <option value="image">Hình ảnh minh họa</option>
                 <option value="none">Không dùng Media</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Đường dẫn Video / YouTube URL / Hình ảnh:</label>
-              <input type="text" id="editMediaUrl" class="form-input" placeholder="https://www.youtube.com/watch?v=k4S_f3p82kM hoặc assets/img/hinh.svg">
+              <label class="form-label">Đường dẫn Video / YouTube URL / Google Drive / MP4:</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="editMediaUrl" class="form-input" style="flex: 1;" placeholder="https://www.youtube.com/watch?v=... hoặc Drive hoặc MP4 LAN">
+                <button type="button" id="btnTestMedia" class="btn btn-secondary" style="white-space: nowrap;">
+                  <i class="fa-solid fa-play"></i> Kiểm tra Video
+                </button>
+              </div>
+              <div id="mediaFeedback" style="margin-top: 6px; font-size: 12px; display: none;"></div>
             </div>
+          </div>
+
+          <!-- Khung xem thử Video / Media ngay trong Studio -->
+          <div id="mediaPreviewWrapper" style="display: none; margin-bottom: 16px; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 12px; font-weight: 600; color: var(--accent-cyan); display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-eye"></i> XEM THỬ TRƯỚC VIDEO / MEDIA:
+              </span>
+              <button type="button" class="btn btn-secondary" style="padding: 2px 8px; font-size: 11px;" id="btnCloseMediaPreview">Đóng</button>
+            </div>
+            <div id="mediaPreviewContainer"></div>
           </div>
 
           <div class="form-group">
@@ -467,6 +484,7 @@ Thuật toán là dãy chỉ dẫn...
 
   <!-- Client Engine & App Logic Scripts -->
   <script src="js/self_study_data.js"></script>
+  <script src="js/self_study_media.js"></script>
   <script src="js/self_study_engine.js"></script>
   <script src="js/self_study_editor.js"></script>
   <script src="js/self_study_app.js"></script>

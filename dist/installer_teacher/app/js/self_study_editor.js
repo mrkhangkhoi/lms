@@ -9,6 +9,57 @@ class SelfStudyEditor {
     this.gatewayUrl = options.gatewayUrl || (typeof window !== 'undefined' ? window.location.origin : 'http://127.0.0.1:49150');
   }
 
+  normalizeLessonToSections(lesson) {
+    if (!lesson || typeof lesson !== 'object') return null;
+    const cloned = JSON.parse(JSON.stringify(lesson));
+
+    if (Array.isArray(cloned.sections) && cloned.sections.length > 0) {
+      return cloned;
+    }
+
+    const sections = [];
+    if (cloned.step1_objectives) {
+      sections.push({
+        id: 'sec_1',
+        type: 'objectives',
+        title: cloned.step1_objectives.title || 'Mục Tiêu Bài Học & Yêu Cầu Cần Đạt',
+        items: Array.isArray(cloned.step1_objectives.items) ? cloned.step1_objectives.items : []
+      });
+    }
+
+    if (cloned.step2_theory) {
+      sections.push({
+        id: 'sec_2',
+        type: 'theory',
+        title: cloned.step2_theory.title || 'Khám Phá Kiến Thức Trọng Tâm (Theo SGK)',
+        media: cloned.step2_theory.media || { type: 'none', url: '', caption: '' },
+        sections: Array.isArray(cloned.step2_theory.sections) ? cloned.step2_theory.sections : []
+      });
+    }
+
+    if (cloned.step3_notebook) {
+      sections.push({
+        id: 'sec_3',
+        type: 'notebook',
+        title: cloned.step3_notebook.title || 'Kiến Thức Cốt Lõi Em Ghi Vào Vở',
+        points: Array.isArray(cloned.step3_notebook.points) ? cloned.step3_notebook.points : []
+      });
+    }
+
+    if (cloned.step4_practice) {
+      sections.push({
+        id: 'sec_4',
+        type: 'practice',
+        title: cloned.step4_practice.title || 'Thử Thách Luyện Tập & Chốt Kiến Thức',
+        cloze: cloned.step4_practice.cloze || null,
+        quizzes: Array.isArray(cloned.step4_practice.quizzes) ? cloned.step4_practice.quizzes : []
+      });
+    }
+
+    cloned.sections = sections;
+    return cloned;
+  }
+
   createNewLesson(id, grade = 6) {
     this.currentLesson = {
       id: id || `tin${grade}_bai_${Date.now()}`,
@@ -57,8 +108,81 @@ class SelfStudyEditor {
     if (!lessonData || typeof lessonData !== 'object') {
       throw new Error('Dữ liệu bài học không hợp lệ');
     }
-    this.currentLesson = JSON.parse(JSON.stringify(lessonData));
+    this.currentLesson = this.normalizeLessonToSections(lessonData);
     return this.currentLesson;
+  }
+
+  addSection(type = 'theory', title = '', props = {}) {
+    if (!this.currentLesson) return null;
+    if (!Array.isArray(this.currentLesson.sections)) {
+      this.currentLesson.sections = [];
+    }
+
+    const secId = `sec_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    let newSec = null;
+
+    if (type === 'objectives') {
+      newSec = {
+        id: secId,
+        type: 'objectives',
+        title: title || 'Mục Tiêu Cần Đạt',
+        items: Array.isArray(props.items) ? props.items : ['Mục tiêu cần đạt mới...']
+      };
+    } else if (type === 'theory') {
+      newSec = {
+        id: secId,
+        type: 'theory',
+        title: title || 'Nội Dung Bài Giảng',
+        media: props.media || { type: 'none', url: '', caption: '' },
+        sections: Array.isArray(props.sections) ? props.sections : [{ heading: 'Nội dung bài học', content: '' }]
+      };
+    } else if (type === 'notebook') {
+      newSec = {
+        id: secId,
+        type: 'notebook',
+        title: title || 'Kiến Thức Cốt Lõi Em Ghi Vào Vở',
+        points: Array.isArray(props.points) ? props.points : ['Ghi nhớ quan trọng...']
+      };
+    } else if (type === 'quiz') {
+      newSec = {
+        id: secId,
+        type: 'quiz',
+        title: title || 'Luyện Tập Trắc Nghiệm',
+        quizzes: Array.isArray(props.quizzes) ? props.quizzes : []
+      };
+    } else {
+      newSec = {
+        id: secId,
+        type: 'practice',
+        title: title || 'Thử Thách Luyện Tập',
+        cloze: props.cloze || null,
+        quizzes: Array.isArray(props.quizzes) ? props.quizzes : []
+      };
+    }
+
+    this.currentLesson.sections.push(newSec);
+    return newSec;
+  }
+
+  removeSection(index) {
+    if (!this.currentLesson?.sections) return;
+    if (index >= 0 && index < this.currentLesson.sections.length) {
+      this.currentLesson.sections.splice(index, 1);
+    }
+  }
+
+  moveSection(index, direction) {
+    if (!this.currentLesson?.sections) return;
+    const len = this.currentLesson.sections.length;
+    if (direction === 'up' && index > 0) {
+      const temp = this.currentLesson.sections[index];
+      this.currentLesson.sections[index] = this.currentLesson.sections[index - 1];
+      this.currentLesson.sections[index - 1] = temp;
+    } else if (direction === 'down' && index < len - 1) {
+      const temp = this.currentLesson.sections[index];
+      this.currentLesson.sections[index] = this.currentLesson.sections[index + 1];
+      this.currentLesson.sections[index + 1] = temp;
+    }
   }
 
   addQuizQuestion(quiz) {
