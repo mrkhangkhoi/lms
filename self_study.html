@@ -409,7 +409,7 @@ Mô tả thuật toán bằng sơ đồ khối..."></textarea>
               <label class="form-label">Đường dẫn Video / YouTube URL / Google Drive / MP4:</label>
               <div style="display: flex; gap: 8px;">
                 <input type="text" id="editMediaUrl" class="form-input" style="flex: 1;" placeholder="https://www.youtube.com/watch?v=... hoặc Drive hoặc MP4 LAN">
-                <button type="button" id="btnTestMedia" class="btn btn-secondary" style="white-space: nowrap;">
+                <button type="button" id="btnTestMedia" class="btn btn-secondary" onclick="window.testMediaUrlAction && window.testMediaUrlAction()" style="white-space: nowrap; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
                   <i class="fa-solid fa-play"></i> Kiểm tra Video
                 </button>
               </div>

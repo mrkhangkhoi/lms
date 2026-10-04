@@ -31,7 +31,9 @@
   function isDirectVideoUrl(url) {
     if (!url || typeof url !== 'string') return false;
     const clean = url.trim().toLowerCase().split('?')[0];
-    return clean.endsWith('.mp4') || clean.endsWith('.webm') || clean.endsWith('.ogg') || clean.endsWith('.m4v');
+    return clean.endsWith('.mp4') || clean.endsWith('.webm') || clean.endsWith('.ogg') ||
+           clean.endsWith('.m4v') || clean.endsWith('.mov') || clean.endsWith('.mkv') ||
+           clean.startsWith('blob:') || clean.startsWith('data:video/');
   }
 
   function isImageUrl(url) {
@@ -54,7 +56,7 @@
       return {
         type: 'youtube',
         id: ytId,
-        embedUrl: `https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&enablejsapi=1`,
+        embedUrl: `https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`,
         rawUrl: clean
       };
     }
@@ -90,16 +92,7 @@
       };
     }
 
-    // 5. Fallback generic HTTP URL
-    if (/^https?:\/\//i.test(clean)) {
-      return {
-        type: 'direct_video',
-        id: null,
-        embedUrl: clean,
-        rawUrl: clean
-      };
-    }
-
+    // 5. Generic HTTP link that is NOT video/image
     return { type: 'invalid', id: null, embedUrl: '', rawUrl: clean };
   }
 
@@ -165,7 +158,7 @@
             <iframe 
               src="${parsed.embedUrl}" 
               title="${caption}" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
               referrerpolicy="strict-origin-when-cross-origin" 
               allowfullscreen>
             </iframe>

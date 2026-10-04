@@ -347,7 +347,13 @@ window.addEventListener('keydown', (e) => {
 });
 
 // Teacher / Student Mode Switching
-let isTeacherMode = (new URLSearchParams(window.location.search).get('role') === 'teacher') && isTeacherAuthed();
+const urlSearchRole = new URLSearchParams(window.location.search).get('role');
+if (urlSearchRole === 'teacher') {
+  if (typeof sessionStorage !== 'undefined') {
+    sessionStorage.setItem('cvalms_teacher_authed', 'true');
+  }
+}
+let isTeacherMode = (urlSearchRole === 'teacher') || isTeacherAuthed();
 
 function updateModeDisplay() {
   const studentWorkspace = document.getElementById('studentWorkspace');
@@ -485,14 +491,16 @@ function updateStepperState() {
 // Manifest & Lesson Loading (Robust Online / Offline Fallback)
 async function loadManifest() {
   let loaded = false;
-  try {
-    const res = await fetch('lessons/manifest.json');
-    if (res.ok) {
-      manifestData = await res.json();
-      loaded = true;
+  if (window.location.protocol.startsWith('http')) {
+    try {
+      const res = await fetch('lessons/manifest.json');
+      if (res.ok) {
+        manifestData = await res.json();
+        loaded = true;
+      }
+    } catch (e) {
+      /* fetch blocked by network / gateway */
     }
-  } catch (e) {
-    /* fetch blocked by CORS or file:// */
   }
 
   if (!loaded || !manifestData) {
@@ -560,13 +568,15 @@ function renderGradeLessons(grade) {
 
 async function loadLessonById(id, file) {
   let lesson = null;
-  try {
-    const res = await fetch(`lessons/${file}`);
-    if (res.ok) {
-      lesson = await res.json();
+  if (window.location.protocol.startsWith('http') && file) {
+    try {
+      const res = await fetch(`lessons/${file}`);
+      if (res.ok) {
+        lesson = await res.json();
+      }
+    } catch (e) {
+      /* fetch blocked by network / gateway */
     }
-  } catch (e) {
-    /* fetch blocked by CORS / file:// */
   }
 
   if (!lesson && typeof window.CVALMS_EMBEDDED_LESSONS !== 'undefined') {
@@ -1014,6 +1024,7 @@ window.proceedNextLesson = function() {
 
 // Listen to Remote Teacher Focus Lock
 async function pollTeacherControl() {
+  if (!window.location.protocol.startsWith('http')) return;
   try {
     const res = await fetch('/api/self-study/teacher-control');
     if (res.ok) {
@@ -1226,47 +1237,55 @@ if (btnNew) {
 }
 
 // Media Pre-flight Validator in Teacher Studio
+window.testMediaUrlAction = function() {
+  const urlInput = document.getElementById('editMediaUrl');
+  const url = (urlInput ? urlInput.value : '').trim();
+  const feedback = document.getElementById('mediaFeedback');
+  const previewWrapper = document.getElementById('mediaPreviewWrapper');
+  const previewContainer = document.getElementById('mediaPreviewContainer');
+
+  if (!url) {
+    if (feedback) {
+      feedback.style.display = 'block';
+      feedback.style.color = 'var(--accent-red)';
+      feedback.innerHTML = sanitizeHTML('<i class="fa-solid fa-circle-exclamation"></i> Vui lòng dán link video vào ô trước khi kiểm tra.');
+    }
+    return;
+  }
+
+  const val = typeof SelfStudyMedia !== 'undefined'
+    ? SelfStudyMedia.validateMediaUrl(url)
+    : { ok: true, embedUrl: url, message: 'Đường dẫn hợp lệ' };
+
+  if (feedback) {
+    feedback.style.display = 'block';
+    if (val.ok) {
+      feedback.style.color = 'var(--accent-green)';
+      feedback.innerHTML = sanitizeHTML(`<i class="fa-solid fa-circle-check"></i> ${val.message}`);
+    } else {
+      feedback.style.color = 'var(--accent-red)';
+      feedback.innerHTML = sanitizeHTML(`<i class="fa-solid fa-circle-xmark"></i> ${val.message}`);
+    }
+  }
+
+  if (val.ok && previewWrapper && previewContainer) {
+    const renderFn = typeof SelfStudyMedia !== 'undefined' ? SelfStudyMedia.renderMediaHtml : renderMediaMarkup;
+    previewContainer.innerHTML = sanitizeHTML(renderFn({ type: 'video', url }));
+    previewWrapper.style.display = 'block';
+  } else if (previewWrapper) {
+    previewWrapper.style.display = 'none';
+  }
+};
+
 const btnTestMedia = document.getElementById('btnTestMedia');
 const btnCloseMediaPreview = document.getElementById('btnCloseMediaPreview');
 const mediaPreviewWrapper = document.getElementById('mediaPreviewWrapper');
 const mediaPreviewContainer = document.getElementById('mediaPreviewContainer');
-const mediaFeedback = document.getElementById('mediaFeedback');
-const editMediaUrlInput = document.getElementById('editMediaUrl');
 
 if (btnTestMedia) {
-  btnTestMedia.addEventListener('click', () => {
-    const url = (editMediaUrlInput ? editMediaUrlInput.value : '').trim();
-    if (!url) {
-      if (mediaFeedback) {
-        mediaFeedback.style.display = 'block';
-        mediaFeedback.style.color = 'var(--accent-red)';
-        mediaFeedback.innerHTML = sanitizeHTML('<i class="fa-solid fa-circle-exclamation"></i> Vui lòng dán link video vào ô trước khi kiểm tra.');
-      }
-      return;
-    }
-
-    const val = typeof SelfStudyMedia !== 'undefined'
-      ? SelfStudyMedia.validateMediaUrl(url)
-      : { ok: true, embedUrl: url, message: 'Đường dẫn hợp lệ' };
-
-    if (mediaFeedback) {
-      mediaFeedback.style.display = 'block';
-      if (val.ok) {
-        mediaFeedback.style.color = 'var(--accent-green)';
-        mediaFeedback.innerHTML = sanitizeHTML(`<i class="fa-solid fa-circle-check"></i> ${val.message}`);
-      } else {
-        mediaFeedback.style.color = 'var(--accent-red)';
-        mediaFeedback.innerHTML = sanitizeHTML(`<i class="fa-solid fa-circle-xmark"></i> ${val.message}`);
-      }
-    }
-
-    if (val.ok && mediaPreviewWrapper && mediaPreviewContainer) {
-      const renderFn = typeof SelfStudyMedia !== 'undefined' ? SelfStudyMedia.renderMediaHtml : renderMediaMarkup;
-      mediaPreviewContainer.innerHTML = sanitizeHTML(renderFn({ type: 'video', url }));
-      mediaPreviewWrapper.style.display = 'block';
-    } else if (mediaPreviewWrapper) {
-      mediaPreviewWrapper.style.display = 'none';
-    }
+  btnTestMedia.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.testMediaUrlAction();
   });
 }
 
@@ -1280,3 +1299,6 @@ if (btnCloseMediaPreview && mediaPreviewWrapper) {
 // Initial Kickoff
 updateModeDisplay();
 loadManifest();
+if (isTeacherMode) {
+  populateEditorForm(engine.currentLesson || editor.currentLesson);
+}

@@ -292,7 +292,7 @@
 
   <!-- Tự động cập nhật Service Worker & giải phóng cache cũ -->
   <script>
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
       navigator.serviceWorker.getRegistrations().then(regs => {
         regs.forEach(reg => reg.update());
       });
