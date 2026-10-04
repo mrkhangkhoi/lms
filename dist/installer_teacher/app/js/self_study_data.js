@@ -110,7 +110,7 @@
         },
         {
           "heading": "2. Hai cách mô tả thuật toán phổ biến",
-          "content": "Trong thực tế và lập trình, người ta dùng 2 cách chính để diễn đạt thuật toán:\n- **Liệt kê từng bước**: Dùng ngôn ngữ tự nhiên để trình bày tuần tự các thao tác (Bước 1, Bước 2, Bước 3...).\n- **Sơ đồ khối (Flowchart)**: Dùng các hình khối đồ họa chuẩn quốc tế kèm các mũi tên chỉ hướng đi của dữ liệu. Cách này giúp người xem nhìn tổng quan trực quan và phát hiện lỗi logic nhanh chóng."
+          "content": "Sơ đồ khối là công cụ trực quan hóa thuật toán bằng các hình học tiêu chuẩn:\n\n![Quy ước các khối hình trong sơ đồ khối Tin học](assets/img/tin6_flowchart_shapes.svg)\n\n- **Hình ô-van:** Bắt đầu hoặc kết thúc thuật toán.\n- **Hình chữ nhật:** Thực hiện phép tính, gán giá trị hoặc thao tác xử lý.\n- **Hình bình hành:** Nhập dữ liệu vào (Input) hoặc xuất kết quả ra (Output).\n- **Hình thoi:** Kiểm tra điều kiện (Đúng/Sai) để rẽ nhánh.\n- **Mũi tên:** Chỉ hướng thực hiện các thao tác tiếp theo."
         },
         {
           "heading": "3. Quy ước các hình khối trong Sơ đồ khối",
@@ -151,7 +151,8 @@
             "D. Nhập dữ liệu từ bàn phím"
           ],
           "correctIndex": 1,
-          "explanation": "Đúng! Hình chữ nhật quy ước cho các lệnh xử lý, tính toán hoặc gán giá trị."
+          "explanation": "Đúng! Hình chữ nhật quy ước cho các lệnh xử lý, tính toán hoặc gán giá trị.",
+          "image": "assets/img/tin6_shape_rect.svg"
         },
         {
           "type": "single_choice",

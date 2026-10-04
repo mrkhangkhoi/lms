@@ -1,6 +1,6 @@
 /**
  * CVALMS EDTECH PRO - CLIENT INTERFACE & EXPERIENCE ENGINE
- * Orchestrates Curriculum, Stepper, YouTube Embeds, Gamification & Sound
+ * Orchestrates Curriculum, Stepper, YouTube Embeds, Images, Anti-Skipping & Teacher PIN Gate
  */
 
 const sanitizeHTML = (h) => (typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(h) : h);
@@ -187,7 +187,8 @@ function renderMediaMarkup(media) {
 // Engine and Editor Instantiation
 const engine = new SelfStudyEngine({
   deskId: (typeof localStorage !== 'undefined' && localStorage.getItem('cvalms_desk_id')) || 'MAY-01',
-  studentName: (typeof localStorage !== 'undefined' && localStorage.getItem('cvalms_student_name')) || 'Học sinh'
+  studentName: (typeof localStorage !== 'undefined' && localStorage.getItem('cvalms_student_name')) || 'Học sinh',
+  minDwellTime: 25 // 25 seconds minimum engagement
 });
 const editor = new SelfStudyEditor();
 
@@ -195,6 +196,7 @@ let manifestData = null;
 let currentGrade = '6';
 let currentActiveStage = 1;
 let currentXp = 150;
+let dwellInterval = null;
 
 // Setup Badges
 const deskIdText = document.getElementById('deskIdText');
@@ -238,33 +240,139 @@ if (btnFullscreen) {
   });
 }
 
+// --- TEACHER AUTHENTICATION & PIN GATEKEEPER ---
+const TEACHER_PIN_DEFAULT = 'cvalms2026';
+const teacherAuthModal = document.getElementById('teacherAuthModal');
+const teacherPinInput = document.getElementById('teacherPinInput');
+const pinErrorMsg = document.getElementById('pinErrorMsg');
+const btnCancelAuthPin = document.getElementById('btnCancelAuthPin');
+const btnConfirmAuthPin = document.getElementById('btnConfirmAuthPin');
+
+function isTeacherAuthed() {
+  return typeof sessionStorage !== 'undefined' && sessionStorage.getItem('cvalms_teacher_authed') === 'true';
+}
+
+function openTeacherAuthModal() {
+  if (teacherAuthModal) {
+    teacherAuthModal.style.display = 'flex';
+    if (teacherPinInput) {
+      teacherPinInput.value = '';
+      teacherPinInput.classList.remove('shake');
+      teacherPinInput.focus();
+    }
+    if (pinErrorMsg) pinErrorMsg.style.display = 'none';
+  }
+}
+
+function closeTeacherAuthModal() {
+  if (teacherAuthModal) teacherAuthModal.style.display = 'none';
+}
+
+if (btnCancelAuthPin) {
+  btnCancelAuthPin.addEventListener('click', closeTeacherAuthModal);
+}
+
+function verifyAndEnterStudio() {
+  const entered = teacherPinInput ? teacherPinInput.value.trim() : '';
+  if (entered === TEACHER_PIN_DEFAULT) {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('cvalms_teacher_authed', 'true');
+    }
+    closeTeacherAuthModal();
+    isTeacherMode = true;
+    updateModeDisplay();
+    populateEditorForm(engine.currentLesson || editor.currentLesson);
+    showToast('Xác thực thành công. Đã vào Studio Soạn bài!', 'fa-user-shield');
+    playSound('correct');
+  } else {
+    if (pinErrorMsg) pinErrorMsg.style.display = 'block';
+    if (teacherPinInput) {
+      teacherPinInput.classList.add('shake');
+      setTimeout(() => teacherPinInput.classList.remove('shake'), 500);
+    }
+    playSound('wrong');
+  }
+}
+
+if (btnConfirmAuthPin) {
+  btnConfirmAuthPin.addEventListener('click', verifyAndEnterStudio);
+}
+
+if (teacherPinInput) {
+  teacherPinInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') verifyAndEnterStudio();
+    if (e.key === 'Escape') closeTeacherAuthModal();
+  });
+}
+
+// Secret Trigger: Click brand logo 3 times in 2s to open Teacher Modal
+let logoClickCount = 0;
+let logoClickTimer = null;
+const brandLogo = document.getElementById('brandLogo');
+if (brandLogo) {
+  brandLogo.addEventListener('click', (e) => {
+    logoClickCount++;
+    if (logoClickCount === 1) {
+      logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
+    } else if (logoClickCount >= 3) {
+      e.preventDefault();
+      clearTimeout(logoClickTimer);
+      logoClickCount = 0;
+      openTeacherAuthModal();
+    }
+  });
+}
+
+// Shortcut: Ctrl + Shift + F12
+window.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'F12') {
+    e.preventDefault();
+    openTeacherAuthModal();
+  }
+});
+
 // Teacher / Student Mode Switching
-let isTeacherMode = new URLSearchParams(window.location.search).get('role') === 'teacher';
+let isTeacherMode = (new URLSearchParams(window.location.search).get('role') === 'teacher') && isTeacherAuthed();
+
 function updateModeDisplay() {
   const studentWorkspace = document.getElementById('studentWorkspace');
   const teacherWorkspace = document.getElementById('teacherWorkspace');
   const sidebar = document.getElementById('sidebar');
   const studioBtnText = document.getElementById('studioBtnText');
+  const studioLockIcon = document.getElementById('studioLockIcon');
 
   if (isTeacherMode) {
     if (studentWorkspace) studentWorkspace.style.display = 'none';
     if (teacherWorkspace) teacherWorkspace.style.display = 'block';
     if (sidebar) sidebar.style.display = 'none';
     if (studioBtnText) studioBtnText.textContent = 'Học sinh';
+    if (studioLockIcon) studioLockIcon.className = 'fa-solid fa-graduation-cap';
   } else {
     if (studentWorkspace) studentWorkspace.style.display = 'block';
     if (teacherWorkspace) teacherWorkspace.style.display = 'none';
     if (sidebar) sidebar.style.display = 'flex';
     if (studioBtnText) studioBtnText.textContent = 'Soạn bài giảng';
+    if (studioLockIcon) studioLockIcon.className = 'fa-solid fa-lock';
   }
 }
 
 const btnToggleStudio = document.getElementById('btnToggleStudio');
 if (btnToggleStudio) {
   btnToggleStudio.addEventListener('click', () => {
-    isTeacherMode = !isTeacherMode;
-    updateModeDisplay();
-    showToast(isTeacherMode ? 'Đã mở Studio Soạn bài' : 'Đã về Chế độ Học sinh', 'fa-pen-ruler');
+    if (isTeacherMode) {
+      isTeacherMode = false;
+      updateModeDisplay();
+      showToast('Đã về Chế độ Học sinh', 'fa-graduation-cap');
+    } else {
+      if (isTeacherAuthed()) {
+        isTeacherMode = true;
+        updateModeDisplay();
+        populateEditorForm(engine.currentLesson || editor.currentLesson);
+        showToast('Đã mở Studio Soạn bài', 'fa-pen-ruler');
+      } else {
+        openTeacherAuthModal();
+      }
+    }
   });
 }
 
@@ -299,6 +407,13 @@ window.switchStage = function(stageNum) {
       if (s === stageNum) tabBtn.classList.add('active');
       else tabBtn.classList.remove('active');
     }
+  }
+
+  // Handle Step 2 Dwell Time Monitoring
+  if (stageNum === 2) {
+    startStep2DwellTimer();
+  } else {
+    stopStep2DwellTimer();
   }
 
   // Smooth scroll to top of workspace
@@ -448,6 +563,7 @@ async function loadLessonById(id, file) {
   }
 }
 
+// --- RENDER STUDENT LESSON ---
 function renderStudentLesson() {
   const l = engine.currentLesson;
   if (!l) return;
@@ -459,16 +575,8 @@ function renderStudentLesson() {
   if (tEl) tEl.textContent = l.title;
   if (dEl) dEl.textContent = l.duration || '35 phút';
 
-  // Render Bước 1: Mục tiêu
-  const s1List = document.getElementById('step1List');
-  if (s1List) {
-    s1List.innerHTML = sanitizeHTML((l.step1_objectives?.items || []).map(item => `
-      <div class="objective-item-row">
-        <div class="obj-check-circle"><i class="fa-solid fa-check"></i></div>
-        <div>${item}</div>
-      </div>
-    `).join(''));
-  }
+  // Render Bước 1: Mục tiêu có Interactive Checkbox
+  renderStep1Objectives();
 
   // Render Bước 2: Media (YouTube / Video / Ảnh) & Lý thuyết
   const mediaBox = document.getElementById('mediaBox');
@@ -508,22 +616,212 @@ function renderStudentLesson() {
     });
   }
 
-  // Render Bước 3: Sổ tay ghi chép
-  const s3List = document.getElementById('step3List');
-  if (s3List) {
-    s3List.innerHTML = sanitizeHTML((l.step3_notebook?.points || []).map(pt => `
-      <div class="notebook-point-card">
-        <div class="notebook-icon"><i class="fa-solid fa-pen-fancy"></i></div>
-        <div>${pt}</div>
-      </div>
-    `).join(''));
-  }
+  // Render Bước 3: Sổ tay ghi chép có Check-off tương tác
+  renderStep3Notebook();
 
-  // Render Bước 4: Luyện tập (Điền khuyết & Trắc nghiệm)
+  // Render Bước 4: Luyện tập (Điền khuyết & Trắc nghiệm kèm ảnh)
   renderStep4Practice();
   updateStepperState();
 }
 
+// --- STEP 1: INTERACTIVE OBJECTIVES CHECKLIST ---
+function renderStep1Objectives() {
+  const l = engine.currentLesson;
+  const s1List = document.getElementById('step1List');
+  const objCheckCount = document.getElementById('objCheckCount');
+  const objTotalCount = document.getElementById('objTotalCount');
+  const btnNext = document.getElementById('btnCompleteStep1');
+  const btnText = document.getElementById('btnTextStep1');
+  const lockIcon = document.getElementById('lockIconStep1');
+
+  if (!s1List || !l) return;
+  const items = l.step1_objectives?.items || [];
+  if (objTotalCount) objTotalCount.textContent = items.length;
+
+  s1List.innerHTML = sanitizeHTML('');
+  items.forEach((item, idx) => {
+    const isChecked = engine.interactions.step1_checked.has(idx);
+    const row = document.createElement('div');
+    row.className = `obj-interactive-item ${isChecked ? 'checked' : ''}`;
+    row.id = `obj_item_${idx}`;
+    row.innerHTML = sanitizeHTML(`
+      <div class="obj-checkbox-box">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <div style="flex: 1; line-height: 1.5;">${item}</div>
+    `);
+
+    row.addEventListener('click', () => {
+      const nowChecked = engine.toggleObjective(idx);
+      if (nowChecked) row.classList.add('checked');
+      else row.classList.remove('checked');
+      updateStep1ProgressUI();
+      playSound('correct');
+    });
+
+    s1List.appendChild(row);
+  });
+
+  updateStep1ProgressUI();
+}
+
+function updateStep1ProgressUI() {
+  const l = engine.currentLesson;
+  const items = l?.step1_objectives?.items || [];
+  const objCheckCount = document.getElementById('objCheckCount');
+  const btnNext = document.getElementById('btnCompleteStep1');
+  const btnText = document.getElementById('btnTextStep1');
+  const lockIcon = document.getElementById('lockIconStep1');
+
+  const checkedCount = engine.interactions.step1_checked.size;
+  if (objCheckCount) objCheckCount.textContent = checkedCount;
+
+  const isReady = engine.isStep1Ready();
+  if (btnNext) {
+    if (isReady) {
+      btnNext.disabled = false;
+      if (btnText) btnText.textContent = 'Đã nắm rõ mục tiêu • Chuyển sang xem bài giảng';
+      if (lockIcon) lockIcon.className = 'fa-solid fa-arrow-right';
+    } else {
+      btnNext.disabled = true;
+      if (btnText) btnText.textContent = `Vui lòng tích chọn đủ ${items.length} mục tiêu để tiếp tục`;
+      if (lockIcon) lockIcon.className = 'fa-solid fa-lock';
+    }
+  }
+}
+
+// --- STEP 2: DWELL-TIME COUNTDOWN TIMER ---
+function startStep2DwellTimer() {
+  stopStep2DwellTimer();
+  updateStep2DwellUI();
+
+  if (engine.isStep2Ready()) return;
+
+  dwellInterval = setInterval(() => {
+    engine.tickDwellTime(1);
+    updateStep2DwellUI();
+    if (engine.isStep2Ready()) {
+      stopStep2DwellTimer();
+      playSound('correct');
+      showToast('Đã hoàn thành thời gian tìm hiểu. Em có thể sang Bước 3!', 'fa-circle-check');
+    }
+  }, 1000);
+}
+
+function stopStep2DwellTimer() {
+  if (dwellInterval) {
+    clearInterval(dwellInterval);
+    dwellInterval = null;
+  }
+}
+
+function updateStep2DwellUI() {
+  const badge = document.getElementById('dwellTimerBadge');
+  const badgeText = document.getElementById('dwellTimerText');
+  const btnNext = document.getElementById('btnCompleteStep2');
+  const btnText = document.getElementById('btnTextStep2');
+  const lockIcon = document.getElementById('lockIconStep2');
+
+  const elapsed = engine.interactions.step2_dwellElapsed;
+  const total = engine.minDwellTime;
+  const remaining = Math.max(0, total - elapsed);
+  const isReady = engine.isStep2Ready();
+
+  if (isReady) {
+    if (badge) {
+      badge.className = 'dwell-timer-tag ready';
+      if (badgeText) badgeText.innerHTML = sanitizeHTML('<i class="fa-solid fa-check"></i> Đã hoàn thành thời gian tìm hiểu');
+    }
+    if (btnNext) {
+      btnNext.disabled = false;
+      if (btnText) btnText.textContent = 'Đã hoàn thành khám phá • Chuyển sang ghi vở';
+      if (lockIcon) lockIcon.className = 'fa-solid fa-arrow-right';
+    }
+  } else {
+    if (badge) {
+      badge.className = 'dwell-timer-tag';
+      if (badgeText) badgeText.innerHTML = sanitizeHTML(`<i class="fa-solid fa-hourglass-half fa-spin"></i> Nghiên cứu bài học (còn ${remaining}s)...`);
+    }
+    if (btnNext) {
+      btnNext.disabled = true;
+      if (btnText) btnText.textContent = `Đang tìm hiểu nội dung (còn ${remaining}s)...`;
+      if (lockIcon) lockIcon.className = 'fa-solid fa-hourglass-half';
+    }
+  }
+}
+
+// --- STEP 3: INTERACTIVE NOTEBOOK CHECK-OFF ---
+function renderStep3Notebook() {
+  const l = engine.currentLesson;
+  const s3List = document.getElementById('step3List');
+  const notesCheckCount = document.getElementById('notesCheckCount');
+  const notesTotalCount = document.getElementById('notesTotalCount');
+
+  if (!s3List || !l) return;
+  const points = l.step3_notebook?.points || [];
+  if (notesTotalCount) notesTotalCount.textContent = points.length;
+
+  s3List.innerHTML = sanitizeHTML('');
+  points.forEach((pt, idx) => {
+    const isChecked = engine.interactions.step3_notesChecked.has(idx);
+    const card = document.createElement('div');
+    card.className = `notebook-interactive-card ${isChecked ? 'checked' : ''}`;
+    card.id = `note_card_${idx}`;
+    card.innerHTML = sanitizeHTML(`
+      <div style="display: flex; align-items: flex-start; gap: 12px; flex: 1;">
+        <i class="fa-solid fa-pen-fancy" style="color: var(--accent-amber); margin-top: 4px;"></i>
+        <div>${pt}</div>
+      </div>
+      <div class="notebook-check-btn" id="note_btn_${idx}">
+        <i class="fa-solid ${isChecked ? 'fa-check' : 'fa-pen'}"></i>
+        <span>${isChecked ? 'Đã ghi xong' : 'Chép vào vở'}</span>
+      </div>
+    `);
+
+    card.addEventListener('click', () => {
+      const nowChecked = engine.toggleNotebook(idx);
+      if (nowChecked) card.classList.add('checked');
+      else card.classList.remove('checked');
+      const btnEl = document.getElementById(`note_btn_${idx}`);
+      if (btnEl) {
+        btnEl.innerHTML = sanitizeHTML(nowChecked ? '<i class="fa-solid fa-check"></i> <span>Đã ghi xong</span>' : '<i class="fa-solid fa-pen"></i> <span>Chép vào vở</span>');
+      }
+      updateStep3ProgressUI();
+      playSound('correct');
+    });
+
+    s3List.appendChild(card);
+  });
+
+  updateStep3ProgressUI();
+}
+
+function updateStep3ProgressUI() {
+  const l = engine.currentLesson;
+  const points = l?.step3_notebook?.points || [];
+  const notesCheckCount = document.getElementById('notesCheckCount');
+  const btnNext = document.getElementById('btnCompleteStep3');
+  const btnText = document.getElementById('btnTextStep3');
+  const lockIcon = document.getElementById('lockIconStep3');
+
+  const checkedCount = engine.interactions.step3_notesChecked.size;
+  if (notesCheckCount) notesCheckCount.textContent = checkedCount;
+
+  const isReady = engine.isStep3Ready();
+  if (btnNext) {
+    if (isReady) {
+      btnNext.disabled = false;
+      if (btnText) btnText.textContent = 'Đã ghi xong bài • Bắt đầu thử thách luyện tập';
+      if (lockIcon) lockIcon.className = 'fa-solid fa-arrow-right';
+    } else {
+      btnNext.disabled = true;
+      if (btnText) btnText.textContent = `Vui lòng xác nhận đã chép đủ ${points.length} ý vào vở`;
+      if (lockIcon) lockIcon.className = 'fa-solid fa-lock';
+    }
+  }
+}
+
+// --- STEP 4: PRACTICE (CLOZE & QUIZZES WITH IMAGES) ---
 function renderStep4Practice() {
   const l = engine.currentLesson;
   const clozeContainer = document.getElementById('clozeContainer');
@@ -560,17 +858,25 @@ function renderStep4Practice() {
     clozeContainer.appendChild(box);
   }
 
-  // Challenge 2: Trắc nghiệm
+  // Challenge 2: Trắc nghiệm (Hỗ trợ hình ảnh minh họa cho câu hỏi)
   if (quizzesContainer && l.step4_practice?.quizzes) {
     l.step4_practice.quizzes.forEach((q, qIdx) => {
       const qBox = document.createElement('div');
       qBox.className = 'quiz-card-box';
       const letters = ['A', 'B', 'C', 'D'];
+
+      const imgHtml = q.image ? `
+        <div class="quiz-illustration-wrap">
+          <img src="${q.image}" class="quiz-illustrate-img" alt="Hình minh họa câu hỏi ${qIdx + 1}" loading="lazy">
+        </div>
+      ` : '';
+
       qBox.innerHTML = sanitizeHTML(`
         <div class="quiz-question-text">
           <span style="color: var(--accent-cyan); margin-right: 8px;">Câu ${qIdx + 1}:</span>
           ${q.question}
         </div>
+        ${imgHtml}
         <div class="quiz-options-grid">
           ${q.options.map((opt, optIdx) => `
             <button class="quiz-option-button" id="q_${qIdx}_opt_${optIdx}" onclick="handleQuizClick(${qIdx}, ${optIdx})">
@@ -649,7 +955,9 @@ function checkAssessmentComplete() {
       banner.style.display = 'flex';
       banner.scrollIntoView({ behavior: 'smooth' });
     }
+    const title = document.getElementById('scoreTitle');
     const detail = document.getElementById('scoreDetail');
+    if (title) title.textContent = 'Xuất Sắc! Em Đã Làm Chủ Bài Học Đạt Chuẩn!';
     if (detail) {
       detail.textContent = `Kết quả: ${score.formattedScore} câu đúng (${score.percent}%). Em được cộng +50 XP!`;
     }
@@ -669,7 +977,7 @@ function checkAssessmentComplete() {
 
     playSound('celebrate');
     launchConfetti();
-    showToast('Xuất sắc! Em đã làm chủ bài học 100%!', 'fa-trophy');
+    showToast('Xuất sắc! Em đã làm chủ bài học đạt chuẩn!', 'fa-trophy');
   }
 }
 
@@ -702,8 +1010,9 @@ async function pollTeacherControl() {
 }
 setInterval(pollTeacherControl, 3500);
 
-// Teacher Studio Form Handlers
+// --- TEACHER STUDIO FORM HANDLERS (ENRICHED WITH IMAGE FIELDS) ---
 function populateEditorForm(l) {
+  if (!l) return;
   const elId = document.getElementById('editLessonId');
   if (elId) elId.value = l.id || '';
   const elGr = document.getElementById('editGrade');
@@ -736,7 +1045,7 @@ function renderEditorQuizzes(quizzes) {
   quizzes.forEach((q, idx) => {
     const div = document.createElement('div');
     div.className = 'challenge-box';
-    div.style.marginBottom = '12px';
+    div.style.marginBottom = '14px';
     div.innerHTML = sanitizeHTML(`
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <strong>Câu hỏi ${idx + 1}</strong>
@@ -745,6 +1054,13 @@ function renderEditorQuizzes(quizzes) {
         </button>
       </div>
       <input type="text" class="form-input" style="margin: 8px 0;" value="${q.question}" placeholder="Nội dung câu hỏi" onchange="updateEditorQuizQuestion(${idx}, this.value)">
+      
+      <!-- Hình ảnh minh họa câu hỏi -->
+      <div style="margin-bottom: 8px;">
+        <label class="form-label" style="font-size: 11px;">Hình ảnh minh họa câu hỏi (tùy chọn URL hoặc assets/img/...):</label>
+        <input type="text" class="form-input" value="${q.image || ''}" placeholder="ví dụ: assets/img/hinh_cau_hoi.svg" onchange="updateEditorQuizImage(${idx}, this.value)">
+      </div>
+
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         ${q.options.map((opt, oIdx) => `
           <input type="text" class="form-input" value="${opt}" placeholder="Phương án ${oIdx + 1}" onchange="updateEditorQuizOpt(${idx}, ${oIdx}, this.value)">
@@ -766,6 +1082,9 @@ window.removeEditorQuiz = function(idx) {
 window.updateEditorQuizQuestion = function(idx, val) {
   editor.currentLesson.step4_practice.quizzes[idx].question = val;
 };
+window.updateEditorQuizImage = function(idx, val) {
+  editor.currentLesson.step4_practice.quizzes[idx].image = val.trim();
+};
 window.updateEditorQuizOpt = function(idx, oIdx, val) {
   editor.currentLesson.step4_practice.quizzes[idx].options[oIdx] = val;
 };
@@ -779,6 +1098,7 @@ if (btnAddQuiz) {
     editor.addQuizQuestion({
       type: 'single_choice',
       question: 'Câu hỏi mới',
+      image: '',
       options: ['Phương án A', 'Phương án B', 'Phương án C', 'Phương án D'],
       correctIndex: 0,
       explanation: 'Giải thích chi tiết phương án'

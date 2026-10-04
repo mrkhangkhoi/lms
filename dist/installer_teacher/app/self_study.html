@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"  crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="css/self_study.css">
   <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
 </head>
@@ -19,10 +19,45 @@
   <!-- Interactive Toast Notification Container -->
   <div id="toastContainer"></div>
 
+  <!-- Teacher PIN Authentication Modal (Bảo mật chống học sinh sửa bài) -->
+  <div id="teacherAuthModal" class="auth-pin-modal-overlay" style="display: none;">
+    <div class="auth-pin-card">
+      <div class="auth-pin-icon">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+      <h3 class="auth-pin-title">Xác Thực Giáo Viên Quản Trị</h3>
+      <p class="auth-pin-desc">
+        Khu vực Soạn bài giảng và Thiết lập chỉ dành cho Thầy / Cô giáo bộ môn. Vui lòng nhập mã PIN quản trị phòng máy để tiếp tục.
+      </p>
+      <div class="pin-input-group">
+        <input type="password" id="teacherPinInput" class="pin-field" placeholder="••••••••" maxlength="16" autofocus>
+        <div id="pinErrorMsg" style="color: var(--accent-rose); font-size: 12px; font-weight: 600; display: none;">Mã PIN không chính xác. Vui lòng thử lại!</div>
+      </div>
+      <div class="auth-pin-actions">
+        <button id="btnCancelAuthPin" class="btn btn-secondary">Hủy bỏ</button>
+        <button id="btnConfirmAuthPin" class="btn btn-primary">
+          <i class="fa-solid fa-unlock-keyhole"></i>
+          <span>Mở Studio</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Focus Lock Modal (Giáo viên khóa từ xa) -->
+  <div id="focusLockOverlay" class="focus-lock-modal" style="display: none;">
+    <div class="lock-big-icon">
+      <i class="fa-solid fa-lock"></i>
+    </div>
+    <h2 class="lock-big-title">Phòng máy đang được giáo viên tạm khóa</h2>
+    <p class="lock-big-desc">
+      Thầy / Cô giáo yêu cầu cả lớp tạm dừng thao tác tự học trên máy để tập trung nghe giảng và hướng dẫn chung trên bảng chiếu.
+    </p>
+  </div>
+
   <!-- App Header -->
   <header class="app-header">
     <div class="brand-section">
-      <a href="index.html" class="brand-logo-wrap" title="Về sảnh chính CVALMS">
+      <a href="index.html" class="brand-logo-wrap" id="brandLogo" title="Về sảnh chính CVALMS (Bấm 3 lần để mở đăng nhập Giáo viên)">
         <div class="brand-icon">
           <i class="fa-solid fa-graduation-cap"></i>
         </div>
@@ -61,8 +96,8 @@
       <button id="btnToggleTheme" class="btn btn-secondary btn-icon-only" title="Đổi giao diện Sáng / Tối">
         <i id="themeIcon" class="fa-solid fa-moon"></i>
       </button>
-      <button id="btnToggleStudio" class="btn btn-secondary">
-        <i class="fa-solid fa-pen-ruler"></i>
+      <button id="btnToggleStudio" class="btn btn-secondary" title="Dành cho Giáo viên (Cần mã PIN)">
+        <i class="fa-solid fa-lock" id="studioLockIcon"></i>
         <span id="studioBtnText">Soạn bài giảng</span>
       </button>
       <button id="btnFullscreen" class="btn btn-secondary btn-icon-only" title="Chế độ toàn màn hình">
@@ -74,17 +109,6 @@
       </a>
     </div>
   </header>
-
-  <!-- Focus Lock Modal (Giáo viên khóa từ xa) -->
-  <div id="focusLockOverlay" class="focus-lock-modal" style="display: none;">
-    <div class="lock-big-icon">
-      <i class="fa-solid fa-lock"></i>
-    </div>
-    <h2 class="lock-big-title">Phòng máy đang được giáo viên tạm khóa</h2>
-    <p class="lock-big-desc">
-      Thầy / Cô giáo yêu cầu cả lớp tạm dừng thao tác tự học trên máy để tập trung nghe giảng và hướng dẫn chung trên bảng chiếu.
-    </p>
-  </div>
 
   <div class="app-layout">
     <!-- Curriculum Sidebar (Danh sách bài học theo khối lớp) -->
@@ -122,7 +146,7 @@
             </div>
             <div class="hero-detail-item">
               <i class="fa-solid fa-list-check"></i>
-              <span>4 bước tiêu chuẩn</span>
+              <span>4 bước tương tác</span>
             </div>
             <div class="hero-detail-item">
               <i class="fa-solid fa-award"></i>
@@ -144,7 +168,7 @@
             <div class="step-tab-num" id="tabNum2">2</div>
             <div class="step-tab-text">
               <div class="step-tab-title">Khám phá & Video</div>
-              <div class="step-tab-sub">Bài giảng SGK</div>
+              <div class="step-tab-sub">Bài giảng trực quan</div>
             </div>
           </button>
           <button class="step-tab-btn" id="tabStep3" onclick="switchStage(3)">
@@ -158,36 +182,47 @@
             <div class="step-tab-num" id="tabNum4">4</div>
             <div class="step-tab-text">
               <div class="step-tab-title">Luyện tập</div>
-              <div class="step-tab-sub">Thử thách & Chấm điểm</div>
+              <div class="step-tab-sub">Thử thách & Chốt bài</div>
             </div>
           </button>
         </nav>
 
-        <!-- Step 1 Content Stage -->
+        <!-- Step 1 Content Stage (Interactive Objective Checklist) -->
         <section class="step-content-card" id="stageStep1">
           <div class="step-stage-header">
             <div class="step-stage-title-wrap">
               <span class="step-stage-badge">Bước 1 / 4</span>
               <h2 class="step-stage-h2">Mục Tiêu Bài Học & Yêu Cầu Cần Đạt</h2>
             </div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--accent-cyan);">
+              Xác nhận: <span id="objCheckCount">0</span> / <span id="objTotalCount">0</span>
+            </div>
           </div>
+          <p style="color: var(--text-muted); font-size: 14px;">
+            <i class="fa-solid fa-hand-pointer" style="color: var(--accent-cyan); margin-right: 6px;"></i>
+            Em hãy đọc kỹ và <strong>bấm tích chọn vào từng mục tiêu bên dưới</strong> để xác nhận đã nắm rõ yêu cầu trước khi bắt đầu học:
+          </p>
           <div class="objective-items-list" id="step1List">
-            <!-- Nạp động -->
+            <!-- Nạp động qua renderObjectivesChecklist() -->
           </div>
-          <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
-            <button id="btnCompleteStep1" class="btn btn-primary" onclick="proceedToStep(2)">
-              <span>Đã hiểu mục tiêu • Chuyển sang xem video</span>
-              <i class="fa-solid fa-arrow-right"></i>
+          <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+            <button id="btnCompleteStep1" class="btn btn-primary" onclick="proceedToStep(2)" disabled>
+              <i class="fa-solid fa-lock" id="lockIconStep1"></i>
+              <span id="btnTextStep1">Vui lòng tích chọn đủ mục tiêu để tiếp tục</span>
             </button>
           </div>
         </section>
 
-        <!-- Step 2 Content Stage (Cinematic Video Player & Core Theory) -->
+        <!-- Step 2 Content Stage (Cinematic Video Player, Multi-Media & Theory) -->
         <section class="step-content-card" id="stageStep2" style="display: none;">
           <div class="step-stage-header">
             <div class="step-stage-title-wrap">
               <span class="step-stage-badge">Bước 2 / 4</span>
               <h2 class="step-stage-h2">Khám Phá Kiến Thức & Bài Giảng Trực Quan</h2>
+            </div>
+            <div id="dwellTimerBadge" class="dwell-timer-tag">
+              <i class="fa-solid fa-hourglass-half fa-spin"></i>
+              <span id="dwellTimerText">Nghiên cứu bài học (còn 25s)...</span>
             </div>
           </div>
 
@@ -196,7 +231,7 @@
             <!-- Nạp động qua renderMedia() -->
           </div>
 
-          <!-- Markdown Theory Content -->
+          <!-- Markdown Theory Content (Hỗ trợ hình ảnh minh họa ![alt](url)) -->
           <div id="step2Content" class="theory-rendered-content">
             <!-- Nạp động -->
           </div>
@@ -206,50 +241,57 @@
             <!-- Nạp động -->
           </div>
 
-          <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 18px;">
             <button class="btn btn-secondary" onclick="switchStage(1)">
               <i class="fa-solid fa-arrow-left"></i>
               <span>Xem lại mục tiêu</span>
             </button>
-            <button id="btnCompleteStep2" class="btn btn-primary" onclick="proceedToStep(3)">
-              <span>Đã hoàn thành khám phá • Chuyển sang ghi vở</span>
-              <i class="fa-solid fa-arrow-right"></i>
+            <button id="btnCompleteStep2" class="btn btn-primary" onclick="proceedToStep(3)" disabled>
+              <i class="fa-solid fa-hourglass-half" id="lockIconStep2"></i>
+              <span id="btnTextStep2">Đang tìm hiểu nội dung (còn 25s)...</span>
             </button>
           </div>
         </section>
 
-        <!-- Step 3 Content Stage (Sổ tay ghi nhớ) -->
+        <!-- Step 3 Content Stage (Sổ tay ghi nhớ tương tác - Chống bỏ qua chép bài) -->
         <section class="step-content-card" id="stageStep3" style="display: none;">
           <div class="step-stage-header">
             <div class="step-stage-title-wrap">
               <span class="step-stage-badge">Bước 3 / 4</span>
               <h2 class="step-stage-h2">Kiến Thức Cốt Lõi Em Ghi Vào Vở</h2>
             </div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--accent-amber);">
+              Đã ghi vở: <span id="notesCheckCount">0</span> / <span id="notesTotalCount">0</span>
+            </div>
           </div>
           <p style="color: var(--text-muted); font-size: 14px;">
-            Hãy mở vở ghi Tin học và ghi chép lại các điểm cốt lõi dưới đây để ghi nhớ sâu sắc kiến thức bài học:
+            <i class="fa-solid fa-pen-nib" style="color: var(--accent-amber); margin-right: 6px;"></i>
+            Mở vở Tin học, ghi chép lại các nội dung cốt lõi dưới đây. Sau khi chép xong ý nào, hãy <strong>bấm vào thẻ đó</strong> để xác nhận:
           </p>
           <div class="notebook-cards-container" id="step3List">
-            <!-- Nạp động -->
+            <!-- Nạp động qua renderNotebookChecklist() -->
           </div>
-          <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 18px;">
             <button class="btn btn-secondary" onclick="switchStage(2)">
               <i class="fa-solid fa-arrow-left"></i>
-              <span>Xem lại video</span>
+              <span>Xem lại bài giảng</span>
             </button>
-            <button id="btnCompleteStep3" class="btn btn-primary" onclick="proceedToStep(4)">
-              <span>Đã ghi xong bài • Bắt đầu thử thách luyện tập</span>
-              <i class="fa-solid fa-arrow-right"></i>
+            <button id="btnCompleteStep3" class="btn btn-primary" onclick="proceedToStep(4)" disabled>
+              <i class="fa-solid fa-lock" id="lockIconStep3"></i>
+              <span id="btnTextStep3">Vui lòng xác nhận đã chép đủ các ý vào vở</span>
             </button>
           </div>
         </section>
 
-        <!-- Step 4 Content Stage (Luyện tập trắc nghiệm & điền khuyết) -->
+        <!-- Step 4 Content Stage (Luyện tập trắc nghiệm & điền khuyết có hình ảnh) -->
         <section class="step-content-card" id="stageStep4" style="display: none;">
           <div class="step-stage-header">
             <div class="step-stage-title-wrap">
               <span class="step-stage-badge">Bước 4 / 4</span>
               <h2 class="step-stage-h2">Thử Thách Luyện Tập & Chốt Kiến Thức</h2>
+            </div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--accent-cyan);">
+              Chuẩn đạt: &ge; 70%
             </div>
           </div>
 
@@ -259,20 +301,20 @@
               <!-- Nạp động -->
             </div>
 
-            <!-- Thử thách Trắc nghiệm (Quiz Challenge) -->
+            <!-- Thử thách Trắc nghiệm (Quiz Challenge kèm hình ảnh minh họa) -->
             <div id="quizzesContainer" class="quizzes-list-stack">
               <!-- Nạp động -->
             </div>
 
-            <!-- Banner Vinh Danh khi Hoàn Thành 100% -->
+            <!-- Banner Vinh Danh khi Hoàn Thành Đạt Chuẩn -->
             <div id="scoreBanner" class="celebration-mastery-banner" style="display: none;">
               <div class="celebration-trophy">
                 <i class="fa-solid fa-trophy"></i>
               </div>
-              <h3 class="celebration-h3">Xuất Sắc! Em Đã Làm Chủ Bài Học 100%!</h3>
+              <h3 class="celebration-h3" id="scoreTitle">Xuất Sắc! Em Đã Làm Chủ Bài Học!</h3>
               <p class="celebration-sub" id="scoreDetail">Kết quả: Đạt điểm tối đa và nhận trọn vẹn huy hiệu tự học.</p>
               <div style="display: flex; gap: 12px; margin-top: 8px;">
-                <button class="btn btn-emerald" onclick="proceedNextLesson()">
+                <button class="btn btn-emerald" id="btnNextLessonAction" onclick="proceedNextLesson()">
                   <i class="fa-solid fa-forward-step"></i>
                   <span>Học bài tiếp theo</span>
                 </button>
@@ -287,15 +329,18 @@
       </div>
     </main>
 
-    <!-- Teacher Studio Workspace (Soạn bài giảng) -->
+    <!-- Teacher Studio Workspace (Soạn bài giảng & Phân quyền bảo mật) -->
     <main class="main-workspace" id="teacherWorkspace" style="display: none;">
       <div class="workspace-inner">
         <div class="teacher-studio-workspace">
           <div class="step-stage-header">
             <div>
-              <h2 class="step-stage-h2">Studio Soạn Bài Giảng Điện Tử CVALMS</h2>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="step-stage-badge" style="background: var(--accent-purple);">Giáo viên</span>
+                <h2 class="step-stage-h2">Studio Soạn Bài Giảng Điện Tử CVALMS</h2>
+              </div>
               <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">
-                Tạo bài học chuẩn Data-Driven JSON, nhúng video YouTube, thêm thẻ kiến thức và câu hỏi tương tác.
+                Tạo bài học chuẩn JSON, nhúng video YouTube, chèn hình ảnh minh họa bài giảng & câu hỏi trắc nghiệm.
               </p>
             </div>
             <div style="display: flex; gap: 8px;">
@@ -353,7 +398,7 @@ Mô tả thuật toán bằng sơ đồ khối..."></textarea>
           <!-- Bước 2: Media & Lý thuyết -->
           <div class="studio-grid-2col">
             <div class="form-group">
-              <label class="form-label">Loại đa phương tiện (Media):</label>
+              <label class="form-label">Loại đa phương tiện (Media chính):</label>
               <select id="editMediaType" class="form-select">
                 <option value="video">Video (YouTube / MP4)</option>
                 <option value="image">Hình ảnh minh họa</option>
@@ -361,15 +406,17 @@ Mô tả thuật toán bằng sơ đồ khối..."></textarea>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Đường dẫn Video / YouTube URL:</label>
-              <input type="text" id="editMediaUrl" class="form-input" placeholder="https://www.youtube.com/watch?v=k4S_f3p82kM">
+              <label class="form-label">Đường dẫn Video / YouTube URL / Hình ảnh:</label>
+              <input type="text" id="editMediaUrl" class="form-input" placeholder="https://www.youtube.com/watch?v=k4S_f3p82kM hoặc assets/img/hinh.svg">
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Bước 2: Nội dung lý thuyết (Hỗ trợ định dạng Markdown):</label>
+            <label class="form-label">Bước 2: Nội dung bài giảng (Hỗ trợ Markdown & chèn ảnh: <code>![chú thích](đường_dẫn_ảnh)</code>):</label>
             <textarea id="editStep2" class="form-textarea" style="min-height: 160px;" placeholder="### 1. Khái niệm thuật toán
-Thuật toán là dãy chỉ dẫn..."></textarea>
+Thuật toán là dãy chỉ dẫn...
+
+![Quy ước sơ đồ khối](assets/img/tin6_flowchart_shapes.svg)"></textarea>
           </div>
 
           <!-- Bước 3: Sổ tay ghi chép -->
@@ -379,10 +426,10 @@ Thuật toán là dãy chỉ dẫn..."></textarea>
 2. Hai cách mô tả: Liệt kê hoặc Sơ đồ khối..."></textarea>
           </div>
 
-          <!-- Bước 4: Danh sách câu hỏi trắc nghiệm -->
+          <!-- Bước 4: Danh sách câu hỏi trắc nghiệm có ảnh minh họa -->
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <label class="form-label">Bước 4: Danh sách câu hỏi trắc nghiệm tương tác:</label>
+              <label class="form-label">Bước 4: Danh sách câu hỏi trắc nghiệm tương tác (Hỗ trợ chèn ảnh cho từng câu):</label>
               <button id="btnAddQuiz" class="btn btn-secondary">
                 <i class="fa-solid fa-plus"></i>
                 <span>Thêm câu hỏi trắc nghiệm</span>

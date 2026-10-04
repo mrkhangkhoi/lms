@@ -1,13 +1,13 @@
 /**
  * CVALMS PRO - SELF-STUDY LEARNING ENGINE (Player Engine)
- * Data-Driven, Gated Progression, Web Audio, Markdown & LAN Sync
+ * Data-Driven, Active Engagement Gating, Anti-Skipping, Web Audio, Markdown & LAN Sync
  */
 
 class SelfStudyEngine {
   constructor(options = {}) {
     this.deskId = options.deskId || 'MAY-00';
     this.studentName = options.studentName || 'Học sinh';
-    this.gatewayUrl = options.gatewayUrl || window?.location?.origin || 'http://127.0.0.1:49150';
+    this.gatewayUrl = options.gatewayUrl || (typeof window !== 'undefined' ? window.location?.origin : 'http://127.0.0.1:49150');
 
     this.currentLesson = null;
     this.unlockedStep = 1;
@@ -15,6 +15,14 @@ class SelfStudyEngine {
     this.userAnswers = {
       cloze: null,
       quizzes: {}
+    };
+
+    // Active Engagement & Anti-Skipping Tracking
+    this.minDwellTime = options.minDwellTime !== undefined ? options.minDwellTime : 25; // seconds
+    this.interactions = {
+      step1_checked: new Set(),
+      step2_dwellElapsed: 0,
+      step3_notesChecked: new Set()
     };
 
     this.teacherControl = {
@@ -85,6 +93,11 @@ class SelfStudyEngine {
       cloze: null,
       quizzes: {}
     };
+    this.interactions = {
+      step1_checked: new Set(),
+      step2_dwellElapsed: 0,
+      step3_notesChecked: new Set()
+    };
 
     // Restore from localStorage if exists
     if (typeof localStorage !== 'undefined' && lessonData?.id) {
@@ -95,6 +108,15 @@ class SelfStudyEngine {
           this.unlockedStep = parsed.unlockedStep || 1;
           this.completedSteps = new Set(parsed.completedSteps || []);
           this.userAnswers = parsed.userAnswers || { cloze: null, quizzes: {} };
+          if (parsed.interactions) {
+            if (Array.isArray(parsed.interactions.step1_checked)) {
+              this.interactions.step1_checked = new Set(parsed.interactions.step1_checked);
+            }
+            if (Array.isArray(parsed.interactions.step3_notesChecked)) {
+              this.interactions.step3_notesChecked = new Set(parsed.interactions.step3_notesChecked);
+            }
+            this.interactions.step2_dwellElapsed = parsed.interactions.step2_dwellElapsed || 0;
+          }
         }
       } catch (e) { /* ignore storage error */ }
     }
@@ -106,12 +128,64 @@ class SelfStudyEngine {
         localStorage.setItem(`cvalms_self_study_${this.currentLesson.id}`, JSON.stringify({
           unlockedStep: this.unlockedStep,
           completedSteps: Array.from(this.completedSteps),
-          userAnswers: this.userAnswers
+          userAnswers: this.userAnswers,
+          interactions: {
+            step1_checked: Array.from(this.interactions.step1_checked),
+            step2_dwellElapsed: this.interactions.step2_dwellElapsed,
+            step3_notesChecked: Array.from(this.interactions.step3_notesChecked)
+          }
         }));
       } catch (e) { /* ignore storage error */ }
     }
   }
 
+  // --- ACTIVE ENGAGEMENT VERIFICATION (ANTI-SKIPPING) ---
+  toggleObjective(index) {
+    if (this.interactions.step1_checked.has(index)) {
+      this.interactions.step1_checked.delete(index);
+    } else {
+      this.interactions.step1_checked.add(index);
+    }
+    this.saveProgressLocal();
+    return this.interactions.step1_checked.has(index);
+  }
+
+  isStep1Ready() {
+    if (this.teacherControl.allowFreeRoam) return true;
+    const total = this.currentLesson?.step1_objectives?.items?.length || 0;
+    if (total === 0) return true;
+    return this.interactions.step1_checked.size >= total;
+  }
+
+  tickDwellTime(seconds = 1) {
+    this.interactions.step2_dwellElapsed += seconds;
+    this.saveProgressLocal();
+    return this.interactions.step2_dwellElapsed;
+  }
+
+  isStep2Ready() {
+    if (this.teacherControl.allowFreeRoam) return true;
+    return this.interactions.step2_dwellElapsed >= this.minDwellTime;
+  }
+
+  toggleNotebook(index) {
+    if (this.interactions.step3_notesChecked.has(index)) {
+      this.interactions.step3_notesChecked.delete(index);
+    } else {
+      this.interactions.step3_notesChecked.add(index);
+    }
+    this.saveProgressLocal();
+    return this.interactions.step3_notesChecked.has(index);
+  }
+
+  isStep3Ready() {
+    if (this.teacherControl.allowFreeRoam) return true;
+    const total = this.currentLesson?.step3_notebook?.points?.length || 0;
+    if (total === 0) return true;
+    return this.interactions.step3_notesChecked.size >= total;
+  }
+
+  // --- STEP ACCESS CONTROLLER ---
   canAccessStep(step) {
     if (this.teacherControl.lockAll) return false;
     if (step > this.teacherControl.maxStep) return false;
@@ -246,6 +320,9 @@ class SelfStudyEngine {
 
     // Inline code
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Markdown Images: ![caption](url)
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<div class="lesson-inline-img-box"><img src="$2" alt="$1" class="lesson-inline-img" loading="lazy"/><div class="lesson-img-caption"><i class="fa-solid fa-image"></i> $1</div></div>');
 
     // Headers
     html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');

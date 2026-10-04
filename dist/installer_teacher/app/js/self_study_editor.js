@@ -73,6 +73,7 @@ class SelfStudyEditor {
     const newQuiz = {
       type: quiz.type || 'single_choice',
       question: quiz.question || 'Câu hỏi trắc nghiệm',
+      image: quiz.image || '',
       options: Array.isArray(quiz.options) ? quiz.options : ['A', 'B', 'C', 'D'],
       correctIndex: typeof quiz.correctIndex === 'number' ? quiz.correctIndex : 0,
       explanation: quiz.explanation || 'Giải thích đáp án'

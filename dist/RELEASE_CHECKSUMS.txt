@@ -1,18 +1,18 @@
 ================================================================================
 CVALMS PRO SUITE - BAN PHAT HANH CHUAN CONG NGHIEP v1.1.0
-Thoi gian: 2026-10-04 10:29:00
+Thoi gian: 2026-10-04 10:48:10
 ================================================================================
 
 1. BO CAI GIAO VIEN (Teacher Suite):
    File:    CvaLms_Teacher_Suite_v1.1.0.zip (0.8 MB)
-   SHA-256: fe7627028eb74878004cf6fc9ab8c38dbb3b53fad8e82109d427cbf60d3ea4df
+   SHA-256: b478f3960383a305926ec54c681be78257933aa542353406a88821d60640c277
 
 2. BO CAI HOC SINH (Student Client):
    File:    CvaLms_Student_Client_Setup_v1.1.0.zip (159.81 MB)
-   SHA-256: 721c0e6fdd9ddb3ed16067df5fec10b03c03b0f2a4ae44a44f2e2a16aec998ac
+   SHA-256: 2cd33625d3c88a255c88a02db1adc1c418e99a21c167e19c4be2b63ef66c2857
 
 3. GOI CAP NHAT TU XA (OTA Update):
    File:    CvaLms_Client_Update_v1.1.0.zip (159.79 MB)
-   SHA-256: 599656632d82f30d0e66d149d299c258fbbe7fe58817692a22eb323066b469fa
+   SHA-256: 9a0fa07294ef55f64462f33029be514e0f2a4e0c334460e83fb0b2c148e943cc
    Metadata: app_release.json
 ================================================================================
