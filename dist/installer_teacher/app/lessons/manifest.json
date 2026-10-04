@@ -9,7 +9,7 @@
         {
           "id": "tin6_bai12",
           "unit": "Chủ đề E: Ứng dụng tin học",
-          "title": "Bài 12: Thuật toán",
+          "title": "Bài 12: Thuật toán và Sơ đồ khối",
           "duration": "35 phút",
           "file": "tin6_bai12.json"
         }
@@ -22,7 +22,7 @@
         {
           "id": "tin7_bai3",
           "unit": "Chủ đề A: Máy tính và cộng đồng",
-          "title": "Bài 3: Quản lý dữ liệu trong máy tính",
+          "title": "Bài 3: Quản lý tệp và thư mục trong máy tính",
           "duration": "35 phút",
           "file": "tin7_bai3.json"
         }
@@ -35,7 +35,7 @@
         {
           "id": "tin8_bai2",
           "unit": "Chủ đề F: Giải quyết vấn đề với sự trợ giúp của máy tính",
-          "title": "Bài 2: Vòng lặp và thuật toán",
+          "title": "Bài 2: Cấu trúc lặp và vòng lặp trong thuật toán",
           "duration": "40 phút",
           "file": "tin8_bai2.json"
         }

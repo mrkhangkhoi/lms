@@ -1,47 +1,75 @@
 {
   "id": "tin8_bai2",
-  "grade": "8",
+  "grade": 8,
   "unit": "Chủ đề F: Giải quyết vấn đề với sự trợ giúp của máy tính",
-  "title": "Bài 2: Vòng lặp và thuật toán",
+  "title": "Bài 2: Cấu trúc lặp và vòng lặp trong thuật toán",
   "duration": "40 phút",
   "step1_objectives": {
     "title": "Mục Tiêu Bài Học & Yêu Cầu Cần Đạt",
     "items": [
-      "Nhận biết được cấu trúc lặp với số lần biết trước và số lần chưa biết trước.",
+      "Nhận biết được câu lệnh lặp với số lần biết trước và lặp với số lần chưa biết trước.",
       "Mô tả được hoạt động của lệnh lặp qua sơ đồ khối và đoạn mã trực quan.",
-      "Viết được chương trình đơn giản áp dụng vòng lặp."
+      "Viết được thuật toán lặp giải quyết bài toán tính tổng, đếm số trong thực tế."
     ]
   },
   "step2_theory": {
     "title": "Khám Phá Kiến Thức Trọng Tâm (Theo SGK)",
+    "media": {
+      "type": "video",
+      "url": "https://www.youtube.com/watch?v=wXhLpD71m94",
+      "caption": "Video bài giảng: Cấu trúc lặp và vòng lặp trong lập trình (Tin học 8)"
+    },
     "sections": [
       {
-        "heading": "1. Khái niệm cấu trúc lặp",
-        "content": "Trong cuộc sống và lập trình, nhiều thao tác được thực hiện lặp đi lặp lại nhiều lần. Trong tin học, cấu trúc lặp dùng để chỉ thị cho máy tính thực hiện lặp lại một nhóm lệnh theo điều kiện xác định."
+        "heading": "1. Cấu trúc lặp trong cuộc sống và máy tính",
+        "content": "Trong đời sống, nhiều hành động được lặp lại: kim đồng hồ quay, học sinh đi học mỗi ngày... Trong tin học, **cấu trúc lặp** là cấu trúc điều khiển cho phép thực hiện lặp đi lặp lại một nhóm thao tác nhất định.",
+        "infographicCards": [
+          {
+            "title": "Lặp biết trước số lần",
+            "desc": "Số lần lặp được xác định cụ thể trước khi thực hiện (Ví dụ: Chạy 5 vòng sân, tính tổng 100 số).",
+            "color": "#38bdf8"
+          },
+          {
+            "title": "Lặp chưa biết trước",
+            "desc": "Số lần lặp phụ thuộc vào một điều kiện. Thao tác tiếp tục lặp khi điều kiện còn đúng và dừng khi điều kiện sai.",
+            "color": "#10b981"
+          }
+        ]
       }
     ]
   },
   "step3_notebook": {
     "title": "Kiến Thức Cốt Lõi Em Ghi Vào Vở",
     "points": [
-      "1. Vòng lặp giúp ngắn gọn mã nguồn và tự động hóa các thao tác lặp lại.",
-      "2. Có 2 dạng lặp chính: Lặp với số lần biết trước và lặp với số lần chưa biết trước."
+      "1. Vòng lặp giúp ngắn gọn mã nguồn, tối ưu hóa thuật toán và tự động hóa các thao tác lặp lại.",
+      "2. Có 2 dạng lặp cơ bản: Lặp với số lần biết trước (For/Repeat n) và Lặp với số lần chưa biết trước (While)."
     ]
   },
   "step4_practice": {
     "title": "Thử Thách Luyện Tập & Chốt Kiến Thức",
+    "cloze": {
+      "text": "Vòng lặp chưa biết trước số lần sẽ tiếp tục thực hiện khi",
+      "blank": "điều kiện lặp còn đúng",
+      "options": [
+        "điều kiện lặp còn đúng",
+        "máy tính hết pin",
+        "người dùng nhấn phím tắt",
+        "sau đúng 10 vòng"
+      ],
+      "explanation": "Chính xác! Khi điều kiện kiểm tra không còn thỏa mãn (Sai), vòng lặp sẽ lập tức kết thúc."
+    },
     "quizzes": [
       {
         "type": "single_choice",
-        "question": "Vòng lặp nào sau đây là lặp với số lần biết trước?",
+        "question": "Trường hợp nào sau đây là cấu trúc lặp với số lần BIẾT TRƯỚC?",
         "options": [
-          "A. Lặp cho đến khi nhấn phím ESC",
-          "B. Lặp đúng 10 lần in ra màn hình từ 'Xin chào'",
-          "C. Lặp cho đến khi pin máy tính yếu",
-          "D. Lặp chờ học sinh nhập đúng mật khẩu"
+          "A. Học từ vựng cho đến khi thuộc lòng",
+          "B. Đếm từ 1 đến 100 và in ra các số chẵn",
+          "C. Đạp xe cho đến khi trời đổ mưa",
+          "D. Chờ đến khi có tin nhắn mới"
         ],
         "correctIndex": 1,
-        "explanation": "Đúng! Lặp đúng 10 lần là số lần lặp đã được xác định trước cụ thể."
+        "explanation": "Đúng! Đếm từ 1 đến 100 là vòng lặp có số lần xác định trước chính xác là 100 lần."
       }
     ]
   }

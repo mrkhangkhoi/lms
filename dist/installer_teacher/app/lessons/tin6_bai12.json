@@ -1,46 +1,64 @@
 {
   "id": "tin6_bai12",
-  "grade": "6",
+  "grade": 6,
   "unit": "Chủ đề E: Ứng dụng tin học",
-  "title": "Bài 12: Thuật toán",
+  "title": "Bài 12: Thuật toán và Sơ đồ khối",
   "duration": "35 phút",
   "step1_objectives": {
     "title": "Mục Tiêu Bài Học & Yêu Cầu Cần Đạt",
     "items": [
       "Nêu được khái niệm thuật toán là một dãy các chỉ dẫn từng bước rõ ràng.",
-      "Mô tả được thuật toán đơn giản bằng cách liệt kê các bước hoặc sơ đồ khối.",
-      "Phát hiện và sửa được lỗi sai trong một thuật toán quen thuộc."
+      "Mô tả được thuật toán đơn giản bằng cách liệt kê các bước hoặc vẽ sơ đồ khối.",
+      "Nhận biết được ý nghĩa của các hình khối quy ước: Bắt đầu/Kết thúc, Thao tác, Điều kiện rẽ nhánh.",
+      "Phát hiện và sửa được lỗi sai trong một quy trình thuật toán quen thuộc."
     ]
   },
   "step2_theory": {
     "title": "Khám Phá Kiến Thức Trọng Tâm (Theo SGK)",
     "media": {
-      "type": "image",
-      "url": "assets/img/tin6_bai12_so_do_khoi.png",
-      "caption": "Sơ đồ khối: Các khối quy ước (Bắt đầu/Kết thúc, Thao tác, Điều kiện)"
+      "type": "video",
+      "url": "https://www.youtube.com/watch?v=k4S_f3p82kM",
+      "caption": "Video bài giảng: Khái niệm thuật toán và Sơ đồ khối (Tin học 6 - Kết nối tri thức)"
     },
     "sections": [
       {
         "heading": "1. Khái niệm thuật toán",
-        "content": "Thuật toán là một dãy các chỉ dẫn rõ ràng, có thứ tự, nhằm giải quyết một vấn đề hay nhiệm vụ cụ thể. Khi thực hiện đầy đủ các chỉ dẫn đó, ta sẽ thu được kết quả mong muốn.",
+        "content": "Thuật toán là một dãy các chỉ dẫn rõ ràng, có thứ tự, nhằm giải quyết một vấn đề hay nhiệm vụ cụ thể. Khi thực hiện đầy đủ các chỉ dẫn đó theo đúng trình tự từ đầu vào (Input), ta sẽ luôn thu được kết quả đầu ra (Output) mong muốn.",
         "infographicCards": [
-          { "title": "Tính dừng", "desc": "Thuật toán phải kết thúc sau một số hữu hạn bước.", "color": "#38bdf8" },
-          { "title": "Tính rõ ràng", "desc": "Mỗi bước phải chính xác, không gây hiểu nhầm hai nghĩa.", "color": "#10b981" },
-          { "title": "Tính đúng đắn", "desc": "Cho ra kết quả chuẩn xác khi đầu vào hợp lệ.", "color": "#f59e0b" }
+          {
+            "title": "Tính dừng",
+            "desc": "Thuật toán bắt buộc phải kết thúc sau một số hữu hạn bước, không bao giờ lặp vô tận.",
+            "color": "#38bdf8"
+          },
+          {
+            "title": "Tính rõ ràng",
+            "desc": "Mỗi bước chỉ dẫn phải đơn nghĩa, chính xác, máy tính hay con người đều hiểu duy nhất một nghĩa.",
+            "color": "#10b981"
+          },
+          {
+            "title": "Tính đúng đắn",
+            "desc": "Khi cung cấp dữ liệu đầu vào hợp lệ, thuật toán luôn cho ra kết quả chuẩn xác theo yêu cầu.",
+            "color": "#f59e0b"
+          }
         ]
       },
       {
         "heading": "2. Hai cách mô tả thuật toán phổ biến",
-        "content": "Có hai cách chính để mô tả thuật toán:\n- **Liệt kê từng bước**: Dùng ngôn ngữ tự nhiên để viết các bước 1, 2, 3...\n- **Sơ đồ khối**: Dùng các hình khối quy ước (Hình elip: Bắt đầu/Kết thúc; Hình chữ nhật: Xử lý; Hình thoi: Điều kiện)."
+        "content": "Trong thực tế và lập trình, người ta dùng 2 cách chính để diễn đạt thuật toán:\n- **Liệt kê từng bước**: Dùng ngôn ngữ tự nhiên để trình bày tuần tự các thao tác (Bước 1, Bước 2, Bước 3...).\n- **Sơ đồ khối (Flowchart)**: Dùng các hình khối đồ họa chuẩn quốc tế kèm các mũi tên chỉ hướng đi của dữ liệu. Cách này giúp người xem nhìn tổng quan trực quan và phát hiện lỗi logic nhanh chóng."
+      },
+      {
+        "heading": "3. Quy ước các hình khối trong Sơ đồ khối",
+        "content": "- **Hình Elip (Oval)**: Đánh dấu điểm **BẮT ĐẦU** hoặc **KẾT THÚC** của thuật toán.\n- **Hình Chữ nhật**: Biểu diễn một **THAO TÁC XỬ LÝ** (tính toán, gán giá trị, hành động thực thi).\n- **Hình Thoi**: Biểu diễn việc **KIỂM TRA ĐIỀU KIỆN** (cho ra 2 nhánh: ĐÚNG hoặc SAI).\n- **Hình Bình hành**: Dùng cho thao tác **NHẬP DỮ LIỆU (Input)** hoặc **XUẤT KẾT QUẢ (Output)**.\n- **Mũi tên**: Chỉ hướng thực hiện tiếp theo giữa các khối."
       }
     ]
   },
   "step3_notebook": {
     "title": "Kiến Thức Cốt Lõi Em Ghi Vào Vở",
     "points": [
-      "1. Thuật toán là một dãy các chỉ dẫn rõ ràng, tuần tự để giải quyết một nhiệm vụ cụ thể.",
-      "2. Hai cách mô tả thuật toán: Liệt kê các bước hoặc vẽ Sơ đồ khối.",
-      "3. Quy ước sơ đồ khối: Elip (Bắt đầu/Kết thúc), Chữ nhật (Phép toán/Thao tác), Hình thoi (Kiểm tra điều kiện rẽ nhánh)."
+      "1. Thuật toán là một dãy các chỉ dẫn rõ ràng, tuần tự để giải quyết một nhiệm vụ cụ thể từ Input ra Output.",
+      "2. Hai cách mô tả: Liệt kê các bước bằng ngôn ngữ tự nhiên hoặc Vẽ Sơ đồ khối.",
+      "3. Ba tính chất cốt lõi: Tính dừng, Tính rõ ràng, Tính đúng đắn.",
+      "4. Quy ước sơ đồ khối: Hình Elip (Bắt đầu/Kết thúc), Hình chữ nhật (Xử lý/Tính toán), Hình thoi (Điều kiện rẽ nhánh), Hình bình hành (Vào/Ra dữ liệu)."
     ]
   },
   "step4_practice": {
@@ -48,8 +66,13 @@
     "cloze": {
       "text": "Thuật toán là một dãy các chỉ dẫn",
       "blank": "từng bước rõ ràng",
-      "options": ["ngẫu nhiên tùy ý", "từng bước rõ ràng", "phức tạp khó hiểu", "không theo thứ tự"],
-      "explanation": "Chính xác! Thuật toán bắt buộc phải gồm các bước chỉ dẫn rõ ràng và có thứ tự xác định."
+      "options": [
+        "tùy hứng ngẫu nhiên",
+        "từng bước rõ ràng",
+        "phức tạp khó hiểu",
+        "không có thứ tự"
+      ],
+      "explanation": "Chính xác! Thuật toán bắt buộc phải gồm các chỉ dẫn từng bước rõ ràng để máy tính hoặc con người có thể thực thi chính xác."
     },
     "quizzes": [
       {
@@ -68,10 +91,10 @@
         "type": "single_choice",
         "question": "Tính chất nào sau đây đảm bảo thuật toán không bị lặp vô tận?",
         "options": [
-          "A. Tính xác định",
+          "A. Tính rõ ràng",
           "B. Tính dừng",
-          "C. Tính phổ dụng",
-          "D. Tính trực quan"
+          "C. Tính khả thi",
+          "D. Tính thẩm mỹ"
         ],
         "correctIndex": 1,
         "explanation": "Chính xác! Tính dừng đảm bảo thuật toán phải kết thúc sau một số bước hữu hạn."

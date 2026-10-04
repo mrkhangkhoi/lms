@@ -1,10 +1,10 @@
 {
   "version": "1.1.0",
-  "releaseDate": "2026-10-04 09:55:48",
+  "releaseDate": "2026-10-04 10:28:47",
   "title": "Ban Nang Cap He Thong Phong May CVALMS PRO v1.1.0",
   "status": "ACTIVE",
   "downloadUrl": "https://github.com/MrKhang-Khoi/cvalms/releases/download/v1.1.0/CvaLms_Client_Update_v1.1.0.zip",
-  "sha256": "954a6a4c88fb028cba7de56dd1a9f261866685c3a40ab4ebe6169f953a99e43b",
+  "sha256": "599656632d82f30d0e66d149d299c258fbbe7fe58817692a22eb323066b469fa",
   "packageSizeMb": 159.79,
   "changelog": [
     "Bo sung trinh nang cap tu dong CvaLms.Updater.exe co giao dien tien trinh",

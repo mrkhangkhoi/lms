@@ -1,79 +1,98 @@
 {
   "id": "tin7_bai3",
-  "grade": "7",
-  "unit": "Chủ đề A: Máy tính và cộng đồng",
-  "title": "Bài 3: Quản lý dữ liệu trong máy tính",
+  "grade": 7,
+  "unit": "Chủ đề 2: Tổ chức lưu trữ, tìm kiếm và trao đổi thông tin",
+  "title": "Bài 3: Quản lý tệp và thư mục trong máy tính",
   "duration": "35 phút",
   "step1_objectives": {
     "title": "Mục Tiêu Bài Học & Yêu Cầu Cần Đạt",
     "items": [
-      "Giải thích được tệp và thư mục là gì, vai trò của hệ điều hành trong quản lý tệp.",
-      "Thực hiện thành thạo các thao tác: tạo, đổi tên, sao chép, di chuyển và xóa tệp/thư mục.",
-      "Biết cách tổ chức cây thư mục khoa học, ngăn nắp trên máy tính phòng máy."
+      "Giải thích được cấu trúc hình cây của hệ thống tệp và thư mục.",
+      "Phân biệt được đường dẫn tương đối và đường dẫn tuyệt đối.",
+      "Thực hiện thành thạo các thao tác tạo mới, đổi tên, sao chép, di chuyển và xóa tệp/thư mục an toàn."
     ]
   },
   "step2_theory": {
     "title": "Khám Phá Kiến Thức Trọng Tâm (Theo SGK)",
     "media": {
       "type": "video",
-      "url": "assets/videos/tin7_bai3_cay_thu_muc.mp4",
-      "caption": "Video trực quan: Cấu trúc phân cấp hình cây của hệ thống tệp tin"
+      "url": "https://www.youtube.com/watch?v=L2GjH-m8_nU",
+      "caption": "Video bài giảng: Quản lý tệp và thư mục trong hệ thống máy tính (Tin học 7)"
     },
     "sections": [
       {
-        "heading": "1. Tệp và thư mục",
-        "content": "Hệ điều hành quản lý dữ liệu trên đĩa dưới dạng tệp (file). Thư mục (folder) là nơi chứa các tệp và các thư mục con khác tạo thành cấu trúc cây.",
+        "heading": "1. Cấu trúc cây thư mục (Directory Tree)",
+        "content": "Hệ điều hành tổ chức lưu trữ thông tin trên đĩa dưới dạng **cây phân cấp**. Gốc của cây là các ổ đĩa (C:, D:...). Trong ổ đĩa có thể chứa các tệp và thư mục con. Thư mục con lại có thể chứa tiếp các thư mục và tệp khác.",
         "infographicCards": [
-          { "title": "Tệp (File)", "desc": "Tập hợp thông tin ghi trên bộ nhớ ngoài. Tên gồm: <phần tên>.<phần mở rộng>", "color": "#38bdf8" },
-          { "title": "Thư mục (Folder)", "desc": "Phương tiện để nhóm các tệp có liên quan, tổ chức theo tầng bậc.", "color": "#10b981" }
+          {
+            "title": "Thư mục gốc (Root)",
+            "desc": "Là vị trí cao nhất trong phân cấp ổ đĩa (Ví dụ C:\\ hoặc D:\\).",
+            "color": "#38bdf8"
+          },
+          {
+            "title": "Thư mục con (Subfolder)",
+            "desc": "Thư mục nằm bên trong một thư mục khác, giúp phân loại dữ liệu khoa học.",
+            "color": "#10b981"
+          },
+          {
+            "title": "Tệp tin (File)",
+            "desc": "Đơn vị lưu trữ cơ bản gồm Tên tệp và Phần mở rộng (Ví dụ: baihoc.docx, video.mp4).",
+            "color": "#f59e0b"
+          }
         ]
       },
       {
-        "heading": "2. Đường dẫn và cây thư mục",
-        "content": "Đường dẫn (path) là chỉ dẫn vị trí chính xác của một tệp hoặc thư mục tính từ ổ đĩa gốc qua các cấp thư mục phân tách bởi dấu gạch chéo ngược `\\` (trên Windows)."
+        "heading": "2. Đường dẫn (Path)",
+        "content": "Đường dẫn là dãy tên các thư mục lồng nhau cách nhau bởi dấu gạch chéo ngược (\\), bắt đầu từ thư mục gốc cho đến tệp/thư mục đích. Ví dụ: D:\\HocTap\\TinHoc7\\Bai3.docx."
       }
     ]
   },
   "step3_notebook": {
     "title": "Kiến Thức Cốt Lõi Em Ghi Vào Vở",
     "points": [
-      "1. Tệp là đơn vị lưu trữ dữ liệu cơ bản trên bộ nhớ ngoài.",
-      "2. Thư mục dùng để tổ chức và sắp xếp tệp theo dạng phân cấp hình cây.",
-      "3. Tên tệp gồm phần tên và phần mở rộng, ngăn cách nhau bởi dấu chấm (.) Ví dụ: baihoc.docx, baocao.xlsx"
+      "1. Tệp tin gồm 2 phần: Tên tệp và Phần mở rộng (đuôi tệp), ngăn cách nhau bởi dấu chấm.",
+      "2. Hệ điều hành quản lý tệp và thư mục theo cấu trúc hình cây phân cấp.",
+      "3. Đường dẫn chỉ ra lộ trình định vị chính xác vị trí của tệp trên ổ đĩa máy tính.",
+      "4. Cần đặt tên tệp/thư mục ngắn gọn, gợi nhớ, không dùng các ký tự đặc biệt bị cấm: \\ / : * ? \" < > |"
     ]
   },
   "step4_practice": {
     "title": "Thử Thách Luyện Tập & Chốt Kiến Thức",
     "cloze": {
-      "text": "Trong hệ điều hành Windows, cấu trúc lưu trữ tệp và thư mục được tổ chức theo dạng",
-      "blank": "hình cây",
-      "options": ["đường thẳng", "hình cây", "vòng tròn", "ngẫu nhiên"],
-      "explanation": "Chính xác! Hệ thống tệp được tổ chức theo cấu trúc phân cấp hình cây (thư mục gốc -> thư mục con -> tệp)."
+      "text": "Hệ điều hành quản lý dữ liệu trên đĩa theo cấu trúc",
+      "blank": "hình cây phân cấp",
+      "options": [
+        "hình cây phân cấp",
+        "hỗn loạn ngẫu nhiên",
+        "vòng tròn khép kín",
+        "đường thẳng một chiều"
+      ],
+      "explanation": "Chính xác! Cấu trúc cây giúp quản lý hàng triệu tệp tin một cách ngăn nắp và truy xuất nhanh chóng."
     },
     "quizzes": [
       {
         "type": "single_choice",
-        "question": "Phần mở rộng của tệp tin thường dùng để làm gì?",
+        "question": "Phần mở rộng (đuôi tệp) của tệp tin dùng để làm gì?",
         "options": [
-          "A. Thể hiện kích thước byte của tệp",
-          "B. Giúp hệ điều hành nhận biết kiểu tệp và chọn phần mềm mở tệp tương ứng",
-          "C. Cho biết ngày giờ tạo tệp",
-          "D. Ghi tên người sở hữu máy tính"
+          "A. Giúp hệ điều hành nhận biết kiểu tệp và chọn phần mềm mở thích hợp",
+          "B. Quy định dung lượng của tệp tin",
+          "C. Xác định ngày tạo của tệp tin",
+          "D. Để làm cho tên tệp dài hơn"
         ],
-        "correctIndex": 1,
-        "explanation": "Chính xác! Ví dụ: .docx là văn bản Word, .py là tệp Python, .png là tệp hình ảnh."
+        "correctIndex": 0,
+        "explanation": "Đúng! Phần mở rộng (như .docx, .xlsx, .mp4, .png) báo cho HĐH biết định dạng dữ liệu."
       },
       {
         "type": "single_choice",
-        "question": "Ký tự nào sau đây KHÔNG được phép xuất hiện trong tên tệp trên Windows?",
+        "question": "Ký tự nào sau đây KHÔNG ĐƯỢC PHÉP xuất hiện trong tên tệp trên hệ điều hành Windows?",
         "options": [
-          "A. Dấu gạch dưới (_)",
-          "B. Dấu hai chấm (:)",
-          "C. Dấu gạch ngang (-)",
-          "D. Chữ số từ 0 đến 9"
+          "A. Dấu gạch ngang (-)",
+          "B. Dấu gạch dưới (_)",
+          "C. Dấu hai chấm (:)",
+          "D. Dấu chấm (.)"
         ],
-        "correctIndex": 1,
-        "explanation": "Chính xác! Các ký tự đặc biệt như : * ? \" < > | không được đặt trong tên tệp trên Windows."
+        "correctIndex": 2,
+        "explanation": "Chính xác! Windows cấm các ký tự đặc biệt hệ thống: \\ / : * ? \" < > |"
       }
     ]
   }

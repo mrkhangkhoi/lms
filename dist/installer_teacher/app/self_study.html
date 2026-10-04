@@ -1,228 +1,425 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CVALMS - Phân Hệ Tự Học Cá Nhân Hóa</title>
+  <title>CVALMS EdTech - Phân Hệ Tự Học Cá Nhân Hóa</title>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"  crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="css/self_study.css">
   <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
 </head>
 <body>
-  <!-- Header -->
+  <!-- Canvas Confetti Effect for 100% Mastery -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Interactive Toast Notification Container -->
+  <div id="toastContainer"></div>
+
+  <!-- App Header -->
   <header class="app-header">
     <div class="brand-section">
-      <div class="brand-logo">CVALMS TỰ HỌC</div>
-      <div id="deskBadge" class="desk-badge">MAY-01</div>
-    </div>
-
-    <div class="header-progress" id="progressSection">
-      <div class="progress-track">
-        <div id="progressBar" class="progress-fill"></div>
+      <a href="index.html" class="brand-logo-wrap" title="Về sảnh chính CVALMS">
+        <div class="brand-icon">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="brand-title">CVALMS EDTECH</div>
+      </a>
+      <div id="deskBadge" class="badge-tag">
+        <span class="pulse-dot"></span>
+        <span id="deskIdText">MAY-01</span>
       </div>
-      <div id="progressPercent" class="progress-text">0%</div>
+      <div id="studentBadge" class="badge-tag" style="background: rgba(99, 102, 241, 0.12); color: var(--accent-indigo); border-color: rgba(99, 102, 241, 0.25);">
+        <i class="fa-solid fa-user"></i>
+        <span id="studentNameText">Học sinh</span>
+      </div>
     </div>
 
-    <div class="header-actions">
-      <button id="btnToggleStudio" class="btn btn-secondary">⚙️ Soạn bài giảng</button>
-      <button id="btnFullscreen" class="btn btn-secondary">⛶ Toàn màn hình</button>
-      <a href="index.html" class="btn btn-primary">⬅️ Về CVALMS</a>
+    <!-- Gamification & Real-Time Progress Strip -->
+    <div class="header-gamification" id="progressSection">
+      <div class="stat-item streak" title="Số ngày học tập liên tục">
+        <i class="fa-solid fa-fire"></i>
+        <span id="streakCount">3 ngày</span>
+      </div>
+      <div class="stat-item xp" title="Điểm kinh nghiệm tích lũy">
+        <i class="fa-solid fa-bolt"></i>
+        <span id="xpCount">150 XP</span>
+      </div>
+      <div class="progress-strip">
+        <div class="progress-track-bar">
+          <div id="progressBar" class="progress-bar-fill"></div>
+        </div>
+        <div id="progressPercent" class="progress-percent-label">0%</div>
+      </div>
+    </div>
+
+    <!-- Action Controls -->
+    <div class="header-controls">
+      <button id="btnToggleTheme" class="btn btn-secondary btn-icon-only" title="Đổi giao diện Sáng / Tối">
+        <i id="themeIcon" class="fa-solid fa-moon"></i>
+      </button>
+      <button id="btnToggleStudio" class="btn btn-secondary">
+        <i class="fa-solid fa-pen-ruler"></i>
+        <span id="studioBtnText">Soạn bài giảng</span>
+      </button>
+      <button id="btnFullscreen" class="btn btn-secondary btn-icon-only" title="Chế độ toàn màn hình">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+      <a href="index.html" class="btn btn-primary" id="btnExitLobby">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Về phòng máy</span>
+      </a>
     </div>
   </header>
 
-  <!-- Focus Lock Overlay -->
-  <div id="focusLockOverlay" class="focus-lock-overlay" style="display: none;">
-    <div class="lock-icon">🔒</div>
-    <h2 class="lock-title">Giáo Viên Đang Khóa Phòng Máy</h2>
-    <p class="lock-subtitle">Thầy/Cô yêu cầu cả lớp tạm dừng tự học để chú ý hướng dẫn trên bảng. Vui lòng lắng nghe!</p>
+  <!-- Focus Lock Modal (Giáo viên khóa từ xa) -->
+  <div id="focusLockOverlay" class="focus-lock-modal" style="display: none;">
+    <div class="lock-big-icon">
+      <i class="fa-solid fa-lock"></i>
+    </div>
+    <h2 class="lock-big-title">Phòng máy đang được giáo viên tạm khóa</h2>
+    <p class="lock-big-desc">
+      Thầy / Cô giáo yêu cầu cả lớp tạm dừng thao tác tự học trên máy để tập trung nghe giảng và hướng dẫn chung trên bảng chiếu.
+    </p>
   </div>
 
-  <div class="app-container">
-    <!-- Sidebar: Danh sách bài học theo khối -->
-    <aside class="sidebar" id="sidebar">
-      <div class="grade-tabs">
-        <div class="grade-tab active" data-grade="6">Khối 6</div>
-        <div class="grade-tab" data-grade="7">Khối 7</div>
-        <div class="grade-tab" data-grade="8">Khối 8</div>
-        <div class="grade-tab" data-grade="9">Khối 9</div>
+  <div class="app-layout">
+    <!-- Curriculum Sidebar (Danh sách bài học theo khối lớp) -->
+    <aside class="curriculum-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-heading">Khối lớp tự học</div>
+        <div class="grade-segmented-control">
+          <button class="grade-btn active" data-grade="6">Lớp 6</button>
+          <button class="grade-btn" data-grade="7">Lớp 7</button>
+          <button class="grade-btn" data-grade="8">Lớp 8</button>
+          <button class="grade-btn" data-grade="9">Lớp 9</button>
+        </div>
       </div>
-      <div id="lessonList" class="lesson-list">
-        <!-- Nạp động từ manifest.json -->
+      <div id="lessonList" class="lesson-list-scroll">
+        <!-- Nạp động từ manifest / fallback database -->
       </div>
     </aside>
 
-    <!-- Main Learning Canvas (Chế độ Học sinh) -->
+    <!-- Main Workspace (Chế độ Học sinh) -->
     <main class="main-workspace" id="studentWorkspace">
-      <div class="content-wrapper">
-        <div class="lesson-header-card">
-          <div id="lessonUnit" class="lesson-unit-tag">CHỦ ĐỀ</div>
-          <h1 id="lessonTitle" class="lesson-main-title">Chọn một bài học để bắt đầu</h1>
-        </div>
-
-        <div id="stepsContainer">
-          <!-- Bước 1: Mục tiêu -->
-          <div id="stepCard1" class="step-card">
-            <div class="step-header">
-              <div class="step-title-wrap">
-                <div class="step-number">1</div>
-                <div class="step-title">Mục Tiêu Bài Học & Yêu Cầu Cần Đạt</div>
-              </div>
+      <div class="workspace-inner">
+        <!-- Lesson Hero Banner -->
+        <section class="lesson-hero-banner">
+          <div class="breadcrumb-nav">
+            <i class="fa-solid fa-book-open"></i>
+            <span id="breadcrumbGrade">Tin học 6</span>
+            <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+            <span id="lessonUnit">Chủ đề bài học</span>
+          </div>
+          <h1 id="lessonTitle" class="lesson-hero-title">Đang tải nội dung bài học...</h1>
+          <div class="lesson-hero-details">
+            <div class="hero-detail-item">
+              <i class="fa-regular fa-clock"></i>
+              <span id="lessonDuration">35 phút</span>
             </div>
-            <div class="step-body">
-              <ul id="step1List" style="padding-left: 20px; margin-bottom: 20px;"></ul>
-              <button id="btnCompleteStep1" class="btn btn-primary">✓ Tôi đã nắm rõ mục tiêu (Tiếp tục)</button>
+            <div class="hero-detail-item">
+              <i class="fa-solid fa-list-check"></i>
+              <span>4 bước tiêu chuẩn</span>
+            </div>
+            <div class="hero-detail-item">
+              <i class="fa-solid fa-award"></i>
+              <span id="heroXpReward">+50 XP khi hoàn thành</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4-Step Interactive Stepper Bar -->
+        <nav class="stepper-nav-bar" id="stepperNav">
+          <button class="step-tab-btn active" id="tabStep1" onclick="switchStage(1)">
+            <div class="step-tab-num" id="tabNum1">1</div>
+            <div class="step-tab-text">
+              <div class="step-tab-title">Mục tiêu</div>
+              <div class="step-tab-sub">Yêu cầu cần đạt</div>
+            </div>
+          </button>
+          <button class="step-tab-btn" id="tabStep2" onclick="switchStage(2)">
+            <div class="step-tab-num" id="tabNum2">2</div>
+            <div class="step-tab-text">
+              <div class="step-tab-title">Khám phá & Video</div>
+              <div class="step-tab-sub">Bài giảng SGK</div>
+            </div>
+          </button>
+          <button class="step-tab-btn" id="tabStep3" onclick="switchStage(3)">
+            <div class="step-tab-num" id="tabNum3">3</div>
+            <div class="step-tab-text">
+              <div class="step-tab-title">Sổ tay ghi nhớ</div>
+              <div class="step-tab-sub">Kiến thức cốt lõi</div>
+            </div>
+          </button>
+          <button class="step-tab-btn" id="tabStep4" onclick="switchStage(4)">
+            <div class="step-tab-num" id="tabNum4">4</div>
+            <div class="step-tab-text">
+              <div class="step-tab-title">Luyện tập</div>
+              <div class="step-tab-sub">Thử thách & Chấm điểm</div>
+            </div>
+          </button>
+        </nav>
+
+        <!-- Step 1 Content Stage -->
+        <section class="step-content-card" id="stageStep1">
+          <div class="step-stage-header">
+            <div class="step-stage-title-wrap">
+              <span class="step-stage-badge">Bước 1 / 4</span>
+              <h2 class="step-stage-h2">Mục Tiêu Bài Học & Yêu Cầu Cần Đạt</h2>
+            </div>
+          </div>
+          <div class="objective-items-list" id="step1List">
+            <!-- Nạp động -->
+          </div>
+          <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+            <button id="btnCompleteStep1" class="btn btn-primary" onclick="proceedToStep(2)">
+              <span>Đã hiểu mục tiêu • Chuyển sang xem video</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- Step 2 Content Stage (Cinematic Video Player & Core Theory) -->
+        <section class="step-content-card" id="stageStep2" style="display: none;">
+          <div class="step-stage-header">
+            <div class="step-stage-title-wrap">
+              <span class="step-stage-badge">Bước 2 / 4</span>
+              <h2 class="step-stage-h2">Khám Phá Kiến Thức & Bài Giảng Trực Quan</h2>
             </div>
           </div>
 
-          <!-- Bước 2: Khám phá lý thuyết & Media -->
-          <div id="stepCard2" class="step-card locked">
-            <div class="step-header">
-              <div class="step-title-wrap">
-                <div class="step-number">2</div>
-                <div class="step-title">Khám Phá Kiến Thức Trọng Tâm (Theo SGK)</div>
-              </div>
+          <!-- Video / Media Container (YouTube 16:9 Cinema Player) -->
+          <div id="mediaBox" style="display: none;">
+            <!-- Nạp động qua renderMedia() -->
+          </div>
+
+          <!-- Markdown Theory Content -->
+          <div id="step2Content" class="theory-rendered-content">
+            <!-- Nạp động -->
+          </div>
+
+          <!-- Infographic Interactive Cards -->
+          <div id="infographicGrid" class="infographic-cards-grid">
+            <!-- Nạp động -->
+          </div>
+
+          <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn btn-secondary" onclick="switchStage(1)">
+              <i class="fa-solid fa-arrow-left"></i>
+              <span>Xem lại mục tiêu</span>
+            </button>
+            <button id="btnCompleteStep2" class="btn btn-primary" onclick="proceedToStep(3)">
+              <span>Đã hoàn thành khám phá • Chuyển sang ghi vở</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- Step 3 Content Stage (Sổ tay ghi nhớ) -->
+        <section class="step-content-card" id="stageStep3" style="display: none;">
+          <div class="step-stage-header">
+            <div class="step-stage-title-wrap">
+              <span class="step-stage-badge">Bước 3 / 4</span>
+              <h2 class="step-stage-h2">Kiến Thức Cốt Lõi Em Ghi Vào Vở</h2>
             </div>
-            <div class="step-body">
-              <div id="mediaBox" class="media-container" style="display: none;"></div>
-              <div id="step2Content"></div>
-              <div id="infographicGrid" class="infographic-grid"></div>
-              <div style="margin-top: 24px;">
-                <button id="btnCompleteStep2" class="btn btn-primary">✓ Đã hoàn thành phần đọc (Chuyển sang ghi vở)</button>
-              </div>
+          </div>
+          <p style="color: var(--text-muted); font-size: 14px;">
+            Hãy mở vở ghi Tin học và ghi chép lại các điểm cốt lõi dưới đây để ghi nhớ sâu sắc kiến thức bài học:
+          </p>
+          <div class="notebook-cards-container" id="step3List">
+            <!-- Nạp động -->
+          </div>
+          <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn btn-secondary" onclick="switchStage(2)">
+              <i class="fa-solid fa-arrow-left"></i>
+              <span>Xem lại video</span>
+            </button>
+            <button id="btnCompleteStep3" class="btn btn-primary" onclick="proceedToStep(4)">
+              <span>Đã ghi xong bài • Bắt đầu thử thách luyện tập</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- Step 4 Content Stage (Luyện tập trắc nghiệm & điền khuyết) -->
+        <section class="step-content-card" id="stageStep4" style="display: none;">
+          <div class="step-stage-header">
+            <div class="step-stage-title-wrap">
+              <span class="step-stage-badge">Bước 4 / 4</span>
+              <h2 class="step-stage-h2">Thử Thách Luyện Tập & Chốt Kiến Thức</h2>
             </div>
           </div>
 
-          <!-- Bước 3: Ghi chép cốt lõi -->
-          <div id="stepCard3" class="step-card locked">
-            <div class="step-header">
-              <div class="step-title-wrap">
-                <div class="step-number">3</div>
-                <div class="step-title">Kiến Thức Cốt Lõi Em Ghi Vào Vở</div>
-              </div>
+          <div class="practice-section-wrap">
+            <!-- Thử thách Điền khuyết (Cloze Challenge) -->
+            <div id="clozeContainer">
+              <!-- Nạp động -->
             </div>
-            <div class="step-body">
-              <div class="notebook-box">
-                <div class="notebook-tag">VỞ GHI TIN HỌC</div>
-                <ul id="step3List" class="notebook-list"></ul>
-              </div>
-              <button id="btnCompleteStep3" class="btn btn-primary">✓ Đã ghi chép xong (Bước vào thử thách)</button>
-            </div>
-          </div>
 
-          <!-- Bước 4: Luyện tập & Đánh giá -->
-          <div id="stepCard4" class="step-card locked">
-            <div class="step-header">
-              <div class="step-title-wrap">
-                <div class="step-number">4</div>
-                <div class="step-title">Thử Thách Luyện Tập & Chốt Kiến Thức</div>
-              </div>
+            <!-- Thử thách Trắc nghiệm (Quiz Challenge) -->
+            <div id="quizzesContainer" class="quizzes-list-stack">
+              <!-- Nạp động -->
             </div>
-            <div class="step-body">
-              <div id="clozeContainer"></div>
-              <div id="quizzesContainer"></div>
-              <div id="scoreBanner" class="score-banner" style="display: none;">
-                <div class="score-title">🎉 Chúc mừng em đã hoàn thành bài học!</div>
-                <div id="scoreDetail" class="score-detail">Điểm số: 10/10 (100%)</div>
+
+            <!-- Banner Vinh Danh khi Hoàn Thành 100% -->
+            <div id="scoreBanner" class="celebration-mastery-banner" style="display: none;">
+              <div class="celebration-trophy">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <h3 class="celebration-h3">Xuất Sắc! Em Đã Làm Chủ Bài Học 100%!</h3>
+              <p class="celebration-sub" id="scoreDetail">Kết quả: Đạt điểm tối đa và nhận trọn vẹn huy hiệu tự học.</p>
+              <div style="display: flex; gap: 12px; margin-top: 8px;">
+                <button class="btn btn-emerald" onclick="proceedNextLesson()">
+                  <i class="fa-solid fa-forward-step"></i>
+                  <span>Học bài tiếp theo</span>
+                </button>
+                <button class="btn btn-secondary" onclick="switchStage(2)">
+                  <i class="fa-solid fa-rotate-left"></i>
+                  <span>Ôn lại lý thuyết</span>
+                </button>
               </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </main>
 
-    <!-- Teacher Studio Canvas (Chế độ Giáo viên Soạn bài) -->
-    <main class="main-workspace editor-container" id="teacherWorkspace">
-      <div class="content-wrapper">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-          <h2>Trình Soạn Thảo Bài Học Tự Học</h2>
-          <div style="display: flex; gap: 8px;">
-            <button id="btnNewLesson" class="btn btn-secondary">➕ Tạo mới</button>
-            <button id="btnExportJson" class="btn btn-secondary">📥 Xuất JSON</button>
-            <label class="btn btn-secondary" style="cursor: pointer; margin: 0;">
-              📂 Nạp JSON <input type="file" id="fileImportJson" accept=".json" style="display: none;">
-            </label>
-            <button id="btnSaveLAN" class="btn btn-success">💾 Lưu lên Máy Chủ LAN</button>
+    <!-- Teacher Studio Workspace (Soạn bài giảng) -->
+    <main class="main-workspace" id="teacherWorkspace" style="display: none;">
+      <div class="workspace-inner">
+        <div class="teacher-studio-workspace">
+          <div class="step-stage-header">
+            <div>
+              <h2 class="step-stage-h2">Studio Soạn Bài Giảng Điện Tử CVALMS</h2>
+              <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">
+                Tạo bài học chuẩn Data-Driven JSON, nhúng video YouTube, thêm thẻ kiến thức và câu hỏi tương tác.
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button id="btnNewLesson" class="btn btn-secondary">
+                <i class="fa-solid fa-plus"></i>
+                <span>Tạo bài mới</span>
+              </button>
+              <button id="btnSwitchToStudentPreview" class="btn btn-primary">
+                <i class="fa-solid fa-eye"></i>
+                <span>Xem thử học sinh</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div class="step-card">
-          <div class="editor-form-group">
-            <label class="editor-label">Mã bài học (ID - viết liền không dấu, vd: tin7_bai4):</label>
-            <input type="text" id="editLessonId" class="editor-input" value="tin7_bai4">
-          </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
-            <div class="editor-form-group">
-              <label class="editor-label">Khối lớp:</label>
-              <select id="editGrade" class="editor-select">
+          <!-- Thông tin tổng quan -->
+          <div class="studio-grid-2col">
+            <div class="form-group">
+              <label class="form-label">Mã định danh (ID):</label>
+              <input type="text" id="editLessonId" class="form-input" placeholder="ví dụ: tin6_bai12">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Khối lớp:</label>
+              <select id="editGrade" class="form-select">
                 <option value="6">Khối 6</option>
-                <option value="7" selected>Khối 7</option>
+                <option value="7">Khối 7</option>
                 <option value="8">Khối 8</option>
                 <option value="9">Khối 9</option>
               </select>
             </div>
-            <div class="editor-form-group">
-              <label class="editor-label">Tên chủ đề SGK:</label>
-              <input type="text" id="editUnit" class="editor-input" value="Chủ đề A: Máy tính và cộng đồng">
+          </div>
+
+          <div class="studio-grid-2col">
+            <div class="form-group">
+              <label class="form-label">Chủ đề bài học (Unit):</label>
+              <input type="text" id="editUnit" class="form-input" placeholder="ví dụ: Chủ đề E: Ứng dụng tin học">
             </div>
-            <div class="editor-form-group">
-              <label class="editor-label">Thời lượng dự kiến:</label>
-              <input type="text" id="editDuration" class="editor-input" value="35 phút">
+            <div class="form-group">
+              <label class="form-label">Thời lượng ước tính:</label>
+              <input type="text" id="editDuration" class="form-input" value="35 phút">
             </div>
           </div>
-          <div class="editor-form-group">
-            <label class="editor-label">Tên bài học:</label>
-            <input type="text" id="editTitle" class="editor-input" value="Bài 4: Phân loại dữ liệu">
+
+          <div class="form-group">
+            <label class="form-label">Tiêu đề bài học (Title):</label>
+            <input type="text" id="editTitle" class="form-input" placeholder="ví dụ: Bài 12: Thuật toán và Sơ đồ khối">
           </div>
-        </div>
 
-        <!-- Bước 1 Soạn thảo -->
-        <div class="step-card">
-          <h3>Bước 1: Mục tiêu bài học (Mỗi dòng một mục tiêu)</h3>
-          <textarea id="editStep1" class="editor-textarea" style="margin-top: 10px;"></textarea>
-        </div>
+          <!-- Bước 1: Mục tiêu -->
+          <div class="form-group">
+            <label class="form-label">Bước 1: Mục tiêu cần đạt (mỗi dòng một mục tiêu):</label>
+            <textarea id="editStep1" class="form-textarea" placeholder="Nêu khái niệm thuật toán...
+Mô tả thuật toán bằng sơ đồ khối..."></textarea>
+          </div>
 
-        <!-- Bước 2 Soạn thảo -->
-        <div class="step-card">
-          <h3>Bước 2: Khám phá lý thuyết & Đa phương tiện</h3>
-          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin: 12px 0;">
-            <div>
-              <label class="editor-label">Loại Media:</label>
-              <select id="editMediaType" class="editor-select">
-                <option value="none">Không có media</option>
-                <option value="image">Hình ảnh</option>
-                <option value="video">Video (MP4 hoặc YouTube)</option>
+          <!-- Bước 2: Media & Lý thuyết -->
+          <div class="studio-grid-2col">
+            <div class="form-group">
+              <label class="form-label">Loại đa phương tiện (Media):</label>
+              <select id="editMediaType" class="form-select">
+                <option value="video">Video (YouTube / MP4)</option>
+                <option value="image">Hình ảnh minh họa</option>
+                <option value="none">Không dùng Media</option>
               </select>
             </div>
-            <div>
-              <label class="editor-label">Đường dẫn Media (URL hoặc đường dẫn nội bộ LAN):</label>
-              <input type="text" id="editMediaUrl" class="editor-input" placeholder="assets/videos/bai1.mp4 hoặc https://youtube.com/embed/...">
+            <div class="form-group">
+              <label class="form-label">Đường dẫn Video / YouTube URL:</label>
+              <input type="text" id="editMediaUrl" class="form-input" placeholder="https://www.youtube.com/watch?v=k4S_f3p82kM">
             </div>
           </div>
-          <label class="editor-label">Nội dung lý thuyết (Hỗ trợ định dạng Markdown):</label>
-          <textarea id="editStep2" class="editor-textarea"></textarea>
-        </div>
 
-        <!-- Bước 3 Soạn thảo -->
-        <div class="step-card">
-          <h3>Bước 3: Kiến thức cốt lõi ghi vở (Mỗi dòng một ý)</h3>
-          <textarea id="editStep3" class="editor-textarea" style="margin-top: 10px;"></textarea>
-        </div>
-
-        <!-- Bước 4 Soạn thảo câu hỏi -->
-        <div class="step-card">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h3>Bước 4: Ngân hàng câu hỏi trắc nghiệm</h3>
-            <button id="btnAddQuiz" class="btn btn-secondary">➕ Thêm câu hỏi</button>
+          <div class="form-group">
+            <label class="form-label">Bước 2: Nội dung lý thuyết (Hỗ trợ định dạng Markdown):</label>
+            <textarea id="editStep2" class="form-textarea" style="min-height: 160px;" placeholder="### 1. Khái niệm thuật toán
+Thuật toán là dãy chỉ dẫn..."></textarea>
           </div>
-          <div id="editorQuizzesList" style="margin-top: 16px;"></div>
-        </div>
 
-        <div style="margin-top: 24px; text-align: right;">
-          <button id="btnSwitchToStudentPreview" class="btn btn-primary">👁️ Xem trước bài học</button>
+          <!-- Bước 3: Sổ tay ghi chép -->
+          <div class="form-group">
+            <label class="form-label">Bước 3: Ghi vở cốt lõi (mỗi dòng một ý chính):</label>
+            <textarea id="editStep3" class="form-textarea" placeholder="1. Thuật toán là dãy các chỉ dẫn...
+2. Hai cách mô tả: Liệt kê hoặc Sơ đồ khối..."></textarea>
+          </div>
+
+          <!-- Bước 4: Danh sách câu hỏi trắc nghiệm -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <label class="form-label">Bước 4: Danh sách câu hỏi trắc nghiệm tương tác:</label>
+              <button id="btnAddQuiz" class="btn btn-secondary">
+                <i class="fa-solid fa-plus"></i>
+                <span>Thêm câu hỏi trắc nghiệm</span>
+              </button>
+            </div>
+            <div id="editorQuizzesList">
+              <!-- Nạp danh sách câu hỏi -->
+            </div>
+          </div>
+
+          <!-- Nút thao tác Lưu & Xuất -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 20px;">
+            <div style="display: flex; gap: 10px;">
+              <button id="btnSaveLAN" class="btn btn-emerald">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Lưu lên máy chủ LAN (Cổng 49150)</span>
+              </button>
+              <button id="btnExportJson" class="btn btn-secondary">
+                <i class="fa-solid fa-download"></i>
+                <span>Tải tệp JSON</span>
+              </button>
+            </div>
+            <div>
+              <label class="btn btn-secondary" style="cursor: pointer;">
+                <i class="fa-solid fa-upload"></i>
+                <span>Nhập từ tệp JSON</span>
+                <input type="file" id="fileImportJson" accept=".json" style="display: none;">
+              </label>
+            </div>
+          </div>
         </div>
       </div>
     </main>
   </div>
 
+  <!-- Client Engine & App Logic Scripts -->
+  <script src="js/self_study_data.js"></script>
   <script src="js/self_study_engine.js"></script>
   <script src="js/self_study_editor.js"></script>
   <script src="js/self_study_app.js"></script>

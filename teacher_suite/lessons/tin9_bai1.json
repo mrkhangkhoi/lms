@@ -1,6 +1,6 @@
 {
   "id": "tin9_bai1",
-  "grade": "9",
+  "grade": 9,
   "unit": "Chủ đề A: Máy tính và xã hội tri thức",
   "title": "Bài 1: Mạng máy tính và dịch vụ Internet",
   "duration": "40 phút",
@@ -8,40 +8,74 @@
     "title": "Mục Tiêu Bài Học & Yêu Cầu Cần Đạt",
     "items": [
       "Hiểu được các thành phần chính của mạng máy tính (thiết bị đầu cuối, thiết bị kết nối, đường truyền).",
-      "Phân biệt được mạng có dây và mạng không dây, mạng cục bộ (LAN) và mạng diện rộng (WAN).",
-      "Nêu được lợi ích của việc chia sẻ tài nguyên mạng trong phòng máy thực hành."
+      "Phân biệt được mạng cục bộ (LAN) và mạng diện rộng (WAN).",
+      "Nêu được lợi ích to lớn của việc kết nối mạng và chia sẻ tài nguyên trong phòng máy nhà trường."
     ]
   },
   "step2_theory": {
     "title": "Khám Phá Kiến Thức Trọng Tâm (Theo SGK)",
+    "media": {
+      "type": "video",
+      "url": "https://www.youtube.com/watch?v=7_LPdttKXPc",
+      "caption": "Video bài giảng: Tổng quan mạng máy tính và xa lộ thông tin Internet (Tin học 9)"
+    },
     "sections": [
       {
         "heading": "1. Mạng máy tính là gì?",
-        "content": "Mạng máy tính là tập hợp các máy tính và thiết bị được kết nối với nhau theo một phương thức nào đó nhằm trao đổi dữ liệu và chia sẻ tài nguyên (như máy in, tệp tin, đường truyền Internet)."
+        "content": "Mạng máy tính là tập hợp các máy tính và thiết bị được kết nối với nhau theo một phương thức nào đó nhằm trao đổi dữ liệu và chia sẻ tài nguyên phần cứng (máy in, ổ cứng) cũng như tài nguyên phần mềm.",
+        "infographicCards": [
+          {
+            "title": "Thiết bị đầu cuối",
+            "desc": "Máy tính bàn, Laptop, Điện thoại, Máy in mạng gửi và nhận dữ liệu.",
+            "color": "#38bdf8"
+          },
+          {
+            "title": "Thiết bị kết nối",
+            "desc": "Switch, Router, Access Point (Wifi), Modem điều phối đường truyền.",
+            "color": "#10b981"
+          },
+          {
+            "title": "Đường truyền dữ liệu",
+            "desc": "Cáp xoắn đôi (Cáp LAN UTP), Cáp quang, Sóng vô tuyến (Wifi, 4G/5G).",
+            "color": "#f59e0b"
+          }
+        ]
       }
     ]
   },
   "step3_notebook": {
     "title": "Kiến Thức Cốt Lõi Em Ghi Vào Vở",
     "points": [
-      "1. Mạng LAN (Local Area Network) là mạng kết nối các máy tính trong phạm vi hẹp như phòng học, tòa nhà.",
-      "2. Ba thành phần cơ bản: Thiết bị đầu cuối (PC, laptop), Thiết bị kết nối (Switch, Access Point, Router), Đường truyền (Cáp mạng, Sóng vô tuyến)."
+      "1. Mạng LAN (Local Area Network): Mạng cục bộ phạm vi hẹp như phòng máy trường học, văn phòng.",
+      "2. Mạng WAN (Wide Area Network): Mạng diện rộng kết nối các mạng LAN trên phạm vi toàn cầu (Internet).",
+      "3. Ba thành phần mạng: Thiết bị đầu cuối, Thiết bị kết nối trung gian, và Môi trường truyền dẫn."
     ]
   },
   "step4_practice": {
     "title": "Thử Thách Luyện Tập & Chốt Kiến Thức",
+    "cloze": {
+      "text": "Mạng máy tính trong phòng thực hành Tin học của trường em là mạng",
+      "blank": "cục bộ LAN",
+      "options": [
+        "cục bộ LAN",
+        "diện rộng WAN",
+        "toàn cầu Internet",
+        "vệ tinh không gian"
+      ],
+      "explanation": "Chính xác! Phòng máy thực hành nhà trường kết nối trong phạm vi một phòng học nên là mạng LAN."
+    },
     "quizzes": [
       {
         "type": "single_choice",
-        "question": "Mạng máy tính trong phòng thực hành Tin học của trường em thuộc loại mạng nào?",
+        "question": "Thiết bị nào sau đây đóng vai trò trung tâm kết nối các máy tính trong phòng máy LAN qua cáp mạng?",
         "options": [
-          "A. Mạng toàn cầu WAN",
-          "B. Mạng cục bộ LAN",
-          "C. Mạng đô thị MAN",
-          "D. Mạng vệ tinh"
+          "A. Switch (Bộ chuyển mạch)",
+          "B. Chuột máy tính",
+          "C. Máy quét Scanner",
+          "D. Màn hình máy tính"
         ],
-        "correctIndex": 1,
-        "explanation": "Đúng! Phòng máy của trường là mạng cục bộ (Local Area Network - LAN)."
+        "correctIndex": 0,
+        "explanation": "Đúng! Switch là thiết bị chuyển mạch trung tâm kết nối các máy tính trạm với nhau."
       }
     ]
   }
