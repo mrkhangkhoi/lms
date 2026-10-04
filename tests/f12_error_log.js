@@ -1,25 +1,16 @@
 /**
  * AUTO-GENERATED F12 DIAGNOSTIC LOG & ERROR TRACE
- * Generated at: 2026-10-03T15:44:49.367Z
- * Failed Checks: 1 / 12
+ * Generated at: 2026-10-04T02:54:50.350Z
+ * Failed Checks: 0 / 12
  */
 
 export const F12_DIAGNOSTIC = {
-  "timestamp": "2026-10-03T15:44:49.367Z",
+  "timestamp": "2026-10-04T02:54:50.350Z",
   "targetDirectory": "C:\\Users\\HPZBook\\OneDrive - Sở GD&ĐT Quảng Ngãi\\Desktop\\CVALMS_PRO_SUITE",
   "totalChecks": 12,
-  "passedChecks": 11,
-  "failedChecks": 1,
-  "failures": [
-    {
-      "name": "F12 Console sạch 100% lỗi Uncaught Exception (0 error)",
-      "details": "Phát hiện lỗi: Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "timestamp": "2026-10-03T15:44:51.465Z"
-    }
-  ],
+  "passedChecks": 12,
+  "failedChecks": 0,
+  "failures": [],
   "networkErrors": [],
-  "consoleErrors": [
-    "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-  ]
+  "consoleErrors": []
 };

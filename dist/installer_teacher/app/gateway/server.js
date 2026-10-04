@@ -102,6 +102,27 @@ let activeSpotlightMachine = null;
 let isTeacherBroadcasting = false;
 const webSockets = new Set();
 
+const ACTIVE_SESSION = {
+  classId: '10A1',
+  lessonId: '',
+  lessonData: null,
+  currentPhase: 'waiting',
+  sessionStatus: 'active',
+  machines: {},
+  pollAnswers: {},
+  discussionAnswers: {}
+};
+
+// Trạng thái phân hệ Tự Học (Self-Study Pro)
+const SELF_STUDY_STATE = {
+  control: {
+    lockAll: false,
+    maxStep: 4,
+    allowFreeRoam: true
+  },
+  desks: {}
+};
+
 // 4. Máy chủ mTLS cho C# Agent (Port 49152)
 const tlsOptions = {
   key: fs.readFileSync(path.join(certsDir, 'gateway.key')),
@@ -539,6 +560,140 @@ const webServer = http.createServer((req, res) => {
     return;
   }
 
+  // ==========================================
+  // API PHÂN HỆ TỰ HỌC (SELF-STUDY PRO)
+  // ==========================================
+  if (url.pathname === '/api/self-study/manifest' && req.method === 'GET') {
+    const manifestPath = path.resolve(__dirname, '../lessons/manifest.json');
+    const fallbackPath = path.resolve(__dirname, '../../lessons/manifest.json');
+    const targetPath = fs.existsSync(manifestPath) ? manifestPath : (fs.existsSync(fallbackPath) ? fallbackPath : null);
+    if (targetPath) {
+      try {
+        const data = JSON.parse(fs.readFileSync(targetPath, 'utf8'));
+        return sendJson(res, 200, data);
+      } catch (e) {
+        return sendJson(res, 500, { error: 'Failed to read manifest' });
+      }
+    }
+    return sendJson(res, 404, { error: 'manifest.json not found' });
+  }
+
+  if (url.pathname === '/api/self-study/lesson' && req.method === 'GET') {
+    const lessonId = url.searchParams.get('id') || '';
+    if (!lessonId || !/^[a-zA-Z0-9_-]+$/.test(lessonId)) {
+      return sendJson(res, 400, { error: 'Invalid or missing lesson id' });
+    }
+    const lessonPath1 = path.resolve(__dirname, `../lessons/${lessonId}.json`);
+    const lessonPath2 = path.resolve(__dirname, `../../lessons/${lessonId}.json`);
+    const targetPath = fs.existsSync(lessonPath1) ? lessonPath1 : (fs.existsSync(lessonPath2) ? lessonPath2 : null);
+    if (targetPath) {
+      try {
+        const data = JSON.parse(fs.readFileSync(targetPath, 'utf8'));
+        return sendJson(res, 200, data);
+      } catch (e) {
+        return sendJson(res, 500, { error: 'Failed to read lesson' });
+      }
+    }
+    return sendJson(res, 404, { error: 'Lesson not found' });
+  }
+
+  if (url.pathname === '/api/self-study/teacher-control' && req.method === 'GET') {
+    return sendJson(res, 200, SELF_STUDY_STATE.control);
+  }
+
+  if (url.pathname === '/api/self-study/live-progress' && req.method === 'GET') {
+    return sendJson(res, 200, SELF_STUDY_STATE);
+  }
+
+  if (url.pathname === '/api/self-study/progress' && req.method === 'POST') {
+    readBody((err, data) => {
+      if (err || !data) return sendJson(res, 400, { error: 'Invalid JSON' });
+      const deskId = String(data.deskId || '').trim();
+      if (!deskId) return sendJson(res, 400, { error: 'Missing deskId' });
+      SELF_STUDY_STATE.desks[deskId] = {
+        deskId,
+        studentName: String(data.studentName || 'Học sinh').trim(),
+        lessonId: String(data.lessonId || '').trim(),
+        step: Number(data.step) || 1,
+        score: String(data.score || '0/0'),
+        completed: Boolean(data.completed),
+        updatedAt: Date.now(),
+        remoteIp
+      };
+      broadcastWebLms({
+        type: 'SELF_STUDY_PROGRESS',
+        desk: SELF_STUDY_STATE.desks[deskId]
+      });
+      return sendJson(res, 200, { success: true });
+    });
+    return;
+  }
+
+  if (url.pathname === '/api/self-study/teacher-control' && req.method === 'POST') {
+    readBody((err, data) => {
+      if (err || !data) return sendJson(res, 400, { error: 'Invalid JSON' });
+      if (typeof data.lockAll === 'boolean') SELF_STUDY_STATE.control.lockAll = data.lockAll;
+      if (typeof data.maxStep === 'number') SELF_STUDY_STATE.control.maxStep = Math.min(4, Math.max(1, data.maxStep));
+      if (typeof data.allowFreeRoam === 'boolean') SELF_STUDY_STATE.control.allowFreeRoam = data.allowFreeRoam;
+
+      broadcastWebLms({
+        type: 'SELF_STUDY_CONTROL',
+        control: SELF_STUDY_STATE.control
+      });
+      return sendJson(res, 200, { success: true, control: SELF_STUDY_STATE.control });
+    });
+    return;
+  }
+
+  if (url.pathname === '/api/self-study/lesson' && req.method === 'POST') {
+    readBody((err, data) => {
+      if (err || !data || !data.lesson) return sendJson(res, 400, { error: 'Invalid lesson payload' });
+      const lesson = data.lesson;
+      if (!lesson.id || !/^[a-zA-Z0-9_-]+$/.test(lesson.id)) {
+        return sendJson(res, 400, { error: 'Invalid lesson id' });
+      }
+      const lessonsDir = path.resolve(__dirname, '../lessons');
+      if (!fs.existsSync(lessonsDir)) fs.mkdirSync(lessonsDir, { recursive: true });
+      const filePath = path.join(lessonsDir, `${lesson.id}.json`);
+      fs.writeFileSync(filePath, JSON.stringify(lesson, null, 2), 'utf8');
+
+      // Đồng bộ sang thư mục gốc nếu tồn tại
+      const rootLessonsDir = path.resolve(__dirname, '../../lessons');
+      if (fs.existsSync(rootLessonsDir)) {
+        fs.writeFileSync(path.join(rootLessonsDir, `${lesson.id}.json`), JSON.stringify(lesson, null, 2), 'utf8');
+      }
+
+      // Cập nhật manifest nếu có
+      const manifestPath = path.join(lessonsDir, 'manifest.json');
+      if (fs.existsSync(manifestPath)) {
+        try {
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          const gradeGroup = manifest.grades.find(g => String(g.grade) === String(lesson.grade));
+          if (gradeGroup) {
+            const existing = gradeGroup.lessons.find(l => l.id === lesson.id);
+            if (!existing) {
+              gradeGroup.lessons.push({
+                id: lesson.id,
+                unit: lesson.unit || 'Chủ đề mới',
+                title: lesson.title || 'Bài học mới',
+                duration: lesson.duration || '35 phút',
+                file: `${lesson.id}.json`
+              });
+              fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
+              if (fs.existsSync(rootLessonsDir)) {
+                fs.writeFileSync(path.join(rootLessonsDir, 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf8');
+              }
+            }
+          }
+        } catch (e) {
+          console.error('[SelfStudy] Lỗi cập nhật manifest:', e);
+        }
+      }
+      return sendJson(res, 200, { success: true, id: lesson.id });
+    });
+    return;
+  }
+
   // 2. Endpoint cấp CSRF Token chính thống cho giao diện Web LMS (Cho phép Localhost và mạng LAN trường học)
   if (url.pathname === '/api/csrf' && req.method === 'GET') {
     if (!isLanOrLocal) {
@@ -654,6 +809,40 @@ const webServer = http.createServer((req, res) => {
 
   if (url.pathname === '/api/submissions' && req.method === 'GET') {
     sendJson(res, 200, { submissions: STORAGE.getAllSubmissions() });
+    return;
+  }
+
+  if (url.pathname === '/api/session' && req.method === 'GET') {
+    sendJson(res, 200, { success: true, session: ACTIVE_SESSION });
+    return;
+  }
+
+  if (url.pathname === '/api/session' && req.method === 'POST') {
+    readBody((err, data) => {
+      if (err) return sendJson(res, 400, { error: 'Invalid JSON' });
+      if (data && typeof data === 'object') {
+        Object.assign(ACTIVE_SESSION, data);
+        broadcastWebLms({ type: 'LMS_SESSION_UPDATE', session: ACTIVE_SESSION });
+      }
+      sendJson(res, 200, { success: true, session: ACTIVE_SESSION });
+    });
+    return;
+  }
+
+  if (url.pathname === '/api/ota-update' && req.method === 'POST') {
+    readBody((err, data) => {
+      if (err) return sendJson(res, 400, { error: 'Invalid JSON' });
+      const target = data.targetMachine || 'ALL';
+      const downloadUrl = data.downloadUrl;
+      const sha256 = data.sha256 || '';
+
+      if (!downloadUrl) {
+        return sendJson(res, 400, { error: 'Thiếu downloadUrl cập nhật' });
+      }
+
+      sendCommandToAgents(target, 'PERFORM_UPDATE', { downloadUrl, sha256 });
+      sendJson(res, 200, { success: true, message: `Đã phát lệnh cập nhật OTA tới ${target}`, downloadUrl });
+    });
     return;
   }
 
@@ -961,6 +1150,48 @@ function handleWebLmsMessage(data) {
     if (data.jpegBase64) {
       const buf = Buffer.from(data.jpegBase64, 'base64');
       broadcastTeacherFrame(buf);
+    }
+  } else if (data.type === 'LMS_GET_SESSION') {
+    broadcastWebLms({ type: 'LMS_SESSION_UPDATE', session: ACTIVE_SESSION });
+  } else if (data.type === 'LMS_UPDATE_SESSION') {
+    if (data.session && typeof data.session === 'object') {
+      Object.assign(ACTIVE_SESSION, data.session);
+      broadcastWebLms({ type: 'LMS_SESSION_UPDATE', session: ACTIVE_SESSION });
+    }
+  } else if (data.type === 'LMS_CHECKIN') {
+    if (data.machineId) {
+      ACTIVE_SESSION.machines[data.machineId] = {
+        machineId: data.machineId,
+        students: data.students || [],
+        status: 'active',
+        joinedAt: Date.now(),
+        isSos: false
+      };
+      broadcastWebLms({ type: 'LMS_SESSION_UPDATE', session: ACTIVE_SESSION });
+    }
+  } else if (data.type === 'LMS_POLL_SUBMIT') {
+    if (data.machineId) {
+      ACTIVE_SESSION.pollAnswers[data.machineId] = {
+        choice: data.choice,
+        timestamp: Date.now()
+      };
+      broadcastWebLms({ type: 'LMS_SESSION_UPDATE', session: ACTIVE_SESSION });
+    }
+  } else if (data.type === 'LMS_DISCUSSION_SUBMIT') {
+    if (data.machineId) {
+      ACTIVE_SESSION.discussionAnswers[data.machineId] = {
+        machineId: data.machineId,
+        students: data.students || [],
+        content: data.content || '',
+        status: 'submitted',
+        submittedAt: Date.now()
+      };
+      broadcastWebLms({ type: 'LMS_SESSION_UPDATE', session: ACTIVE_SESSION });
+    }
+  } else if (data.type === 'LMS_SOS') {
+    if (data.machineId && ACTIVE_SESSION.machines[data.machineId]) {
+      ACTIVE_SESSION.machines[data.machineId].isSos = !!data.isSos;
+      broadcastWebLms({ type: 'LMS_SESSION_UPDATE', session: ACTIVE_SESSION });
     }
   }
 }

@@ -113,15 +113,52 @@ public class Worker : BackgroundService
             switch (action)
             {
                 case "FIREWALL_BLOCK":
-                    // Chặn Internet toàn bộ (chỉ chừa mạng nội bộ LAN / Gateway)
-                    RunCommand("netsh", "advfirewall firewall delete rule name=\"CVALMS_BLOCK_WAN\"");
-                    // Block tất cả Outbound port 80, 443 ngoại trừ subnet LAN nếu có chỉ định
-                    RunCommand("netsh", "advfirewall firewall add rule name=\"CVALMS_BLOCK_WAN\" dir=out action=block protocol=TCP remoteport=80,443,8080,8443");
+                    RemoveFirewallRules();
+                    // 1. Cho phép LAN nội bộ và Cổng Gateway giáo viên
+                    RunCommand("netsh", "advfirewall firewall add rule name=\"CVALMS_ALLOW_LAN\" dir=out action=allow remoteip=localsubnet");
+                    RunCommand("netsh", "advfirewall firewall add rule name=\"CVALMS_ALLOW_GATEWAY\" dir=out action=allow protocol=TCP remoteip=localsubnet remoteport=49150,49152");
+                    // 2. Chặn lưu lượng Web ngoại mạng TCP
+                    RunCommand("netsh", "advfirewall firewall add rule name=\"CVALMS_BLOCK_WEB\" dir=out action=block protocol=TCP remoteport=80,443,8000,8080,8443,8888");
+                    // 3. Chặn DNS ngoại mạng (UDP/TCP 53, DoT 853)
+                    RunCommand("netsh", "advfirewall firewall add rule name=\"CVALMS_BLOCK_DNS\" dir=out action=block protocol=UDP remoteport=53,853");
+                    RunCommand("netsh", "advfirewall firewall add rule name=\"CVALMS_BLOCK_DNS_TCP\" dir=out action=block protocol=TCP remoteport=53,853");
+                    // 4. Chặn UDP QUIC và VPN (UDP 443, WireGuard 51820, OpenVPN 1194, IPSec)
+                    RunCommand("netsh", "advfirewall firewall add rule name=\"CVALMS_BLOCK_VPN\" dir=out action=block protocol=UDP remoteport=443,1194,500,4500,51820");
+                    // 5. Chặn toàn bộ IPv6 ra ngoài
+                    RunCommand("netsh", "advfirewall firewall add rule name=\"CVALMS_BLOCK_IPV6\" dir=out action=block remoteip=::/0");
                     return "OK:FIREWALL_BLOCKED";
 
                 case "FIREWALL_UNBLOCK":
-                    RunCommand("netsh", "advfirewall firewall delete rule name=\"CVALMS_BLOCK_WAN\"");
+                    RemoveFirewallRules();
                     return "OK:FIREWALL_UNBLOCKED";
+
+                case "EXECUTE_UPDATE":
+                    var uParts = arg.Split('|');
+                    if (uParts.Length >= 3)
+                    {
+                        string extractDir = uParts[0];
+                        string targetDir = uParts[1];
+                        string pid = uParts[2];
+                        string updaterExe = Path.Combine(targetDir, "CvaLms.Updater.exe");
+                        if (!File.Exists(updaterExe))
+                        {
+                            updaterExe = Path.Combine(extractDir, "CvaLms.Updater.exe");
+                        }
+                        if (File.Exists(updaterExe))
+                        {
+                            var psi = new ProcessStartInfo
+                            {
+                                FileName = updaterExe,
+                                Arguments = $"--pid {pid} --source \"{extractDir}\" --target \"{targetDir}\" --restart \"CvaLmsAgent.exe\"",
+                                UseShellExecute = false,
+                                CreateNoWindow = true
+                            };
+                            Process.Start(psi);
+                            return "OK:UPDATE_STARTED";
+                        }
+                        return "ERR:UPDATER_NOT_FOUND";
+                    }
+                    return "ERR:INVALID_ARGS";
 
                 case "TASKMGR_LOCK":
                     SetTaskMgrPolicy(true);
@@ -184,6 +221,18 @@ public class Worker : BackgroundService
         {
             _logger.LogWarning("Watchdog: CvaLmsAgent is not running.");
         }
+    }
+
+    private static void RemoveFirewallRules()
+    {
+        RunCommand("netsh", "advfirewall firewall delete rule name=\"CVALMS_BLOCK_WAN\"");
+        RunCommand("netsh", "advfirewall firewall delete rule name=\"CVALMS_BLOCK_WEB\"");
+        RunCommand("netsh", "advfirewall firewall delete rule name=\"CVALMS_BLOCK_DNS\"");
+        RunCommand("netsh", "advfirewall firewall delete rule name=\"CVALMS_BLOCK_DNS_TCP\"");
+        RunCommand("netsh", "advfirewall firewall delete rule name=\"CVALMS_BLOCK_VPN\"");
+        RunCommand("netsh", "advfirewall firewall delete rule name=\"CVALMS_BLOCK_IPV6\"");
+        RunCommand("netsh", "advfirewall firewall delete rule name=\"CVALMS_ALLOW_LAN\"");
+        RunCommand("netsh", "advfirewall firewall delete rule name=\"CVALMS_ALLOW_GATEWAY\"");
     }
 
     private static void RunCommand(string fileName, string args)

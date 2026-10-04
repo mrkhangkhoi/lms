@@ -1,0 +1,81 @@
+{
+  "id": "tin6_bai12",
+  "grade": "6",
+  "unit": "Chủ đề E: Ứng dụng tin học",
+  "title": "Bài 12: Thuật toán",
+  "duration": "35 phút",
+  "step1_objectives": {
+    "title": "Mục Tiêu Bài Học & Yêu Cầu Cần Đạt",
+    "items": [
+      "Nêu được khái niệm thuật toán là một dãy các chỉ dẫn từng bước rõ ràng.",
+      "Mô tả được thuật toán đơn giản bằng cách liệt kê các bước hoặc sơ đồ khối.",
+      "Phát hiện và sửa được lỗi sai trong một thuật toán quen thuộc."
+    ]
+  },
+  "step2_theory": {
+    "title": "Khám Phá Kiến Thức Trọng Tâm (Theo SGK)",
+    "media": {
+      "type": "image",
+      "url": "assets/img/tin6_bai12_so_do_khoi.png",
+      "caption": "Sơ đồ khối: Các khối quy ước (Bắt đầu/Kết thúc, Thao tác, Điều kiện)"
+    },
+    "sections": [
+      {
+        "heading": "1. Khái niệm thuật toán",
+        "content": "Thuật toán là một dãy các chỉ dẫn rõ ràng, có thứ tự, nhằm giải quyết một vấn đề hay nhiệm vụ cụ thể. Khi thực hiện đầy đủ các chỉ dẫn đó, ta sẽ thu được kết quả mong muốn.",
+        "infographicCards": [
+          { "title": "Tính dừng", "desc": "Thuật toán phải kết thúc sau một số hữu hạn bước.", "color": "#38bdf8" },
+          { "title": "Tính rõ ràng", "desc": "Mỗi bước phải chính xác, không gây hiểu nhầm hai nghĩa.", "color": "#10b981" },
+          { "title": "Tính đúng đắn", "desc": "Cho ra kết quả chuẩn xác khi đầu vào hợp lệ.", "color": "#f59e0b" }
+        ]
+      },
+      {
+        "heading": "2. Hai cách mô tả thuật toán phổ biến",
+        "content": "Có hai cách chính để mô tả thuật toán:\n- **Liệt kê từng bước**: Dùng ngôn ngữ tự nhiên để viết các bước 1, 2, 3...\n- **Sơ đồ khối**: Dùng các hình khối quy ước (Hình elip: Bắt đầu/Kết thúc; Hình chữ nhật: Xử lý; Hình thoi: Điều kiện)."
+      }
+    ]
+  },
+  "step3_notebook": {
+    "title": "Kiến Thức Cốt Lõi Em Ghi Vào Vở",
+    "points": [
+      "1. Thuật toán là một dãy các chỉ dẫn rõ ràng, tuần tự để giải quyết một nhiệm vụ cụ thể.",
+      "2. Hai cách mô tả thuật toán: Liệt kê các bước hoặc vẽ Sơ đồ khối.",
+      "3. Quy ước sơ đồ khối: Elip (Bắt đầu/Kết thúc), Chữ nhật (Phép toán/Thao tác), Hình thoi (Kiểm tra điều kiện rẽ nhánh)."
+    ]
+  },
+  "step4_practice": {
+    "title": "Thử Thách Luyện Tập & Chốt Kiến Thức",
+    "cloze": {
+      "text": "Thuật toán là một dãy các chỉ dẫn",
+      "blank": "từng bước rõ ràng",
+      "options": ["ngẫu nhiên tùy ý", "từng bước rõ ràng", "phức tạp khó hiểu", "không theo thứ tự"],
+      "explanation": "Chính xác! Thuật toán bắt buộc phải gồm các bước chỉ dẫn rõ ràng và có thứ tự xác định."
+    },
+    "quizzes": [
+      {
+        "type": "single_choice",
+        "question": "Trong sơ đồ khối, hình chữ nhật biểu thị thao tác nào?",
+        "options": [
+          "A. Bắt đầu hoặc kết thúc thuật toán",
+          "B. Thực hiện một phép tính hoặc thao tác xử lý",
+          "C. Kiểm tra điều kiện so sánh để rẽ nhánh",
+          "D. Nhập dữ liệu từ bàn phím"
+        ],
+        "correctIndex": 1,
+        "explanation": "Đúng! Hình chữ nhật quy ước cho các lệnh xử lý, tính toán hoặc gán giá trị."
+      },
+      {
+        "type": "single_choice",
+        "question": "Tính chất nào sau đây đảm bảo thuật toán không bị lặp vô tận?",
+        "options": [
+          "A. Tính xác định",
+          "B. Tính dừng",
+          "C. Tính phổ dụng",
+          "D. Tính trực quan"
+        ],
+        "correctIndex": 1,
+        "explanation": "Chính xác! Tính dừng đảm bảo thuật toán phải kết thúc sau một số bước hữu hạn."
+      }
+    ]
+  }
+}

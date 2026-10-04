@@ -809,11 +809,21 @@ public class AgentTlsClient
             if (File.Exists(updaterExe))
             {
                 int pid = Environment.ProcessId;
+                // Ủy quyền cho CvaLmsService chạy với quyền SYSTEM để ghi đè Program Files không bị chặn quyền
+                string pipeCmd = $"EXECUTE_UPDATE:{extractDir}|{appDir}|{pid}";
+                if (SendPipeCommand(pipeCmd))
+                {
+                    Console.WriteLine("[OTA Update]: Đã chuyển giao tiến trình cập nhật cho CvaLmsService (Quyền SYSTEM). Thoát Agent.");
+                    Environment.Exit(0);
+                    return;
+                }
+
                 var psi = new ProcessStartInfo
                 {
                     FileName = updaterExe,
                     Arguments = $"--pid {pid} --source \"{extractDir}\" --target \"{appDir}\" --restart \"CvaLmsAgent.exe\"",
-                    UseShellExecute = true
+                    UseShellExecute = true,
+                    Verb = "runas"
                 };
                 Process.Start(psi);
                 Environment.Exit(0);

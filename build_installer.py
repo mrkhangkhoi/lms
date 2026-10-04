@@ -61,6 +61,12 @@ for f in os.listdir(temp_pack):
     if os.path.isfile(src_f) and f.endswith(".exe"):
         shutil.copy2(src_f, os.path.join(student_bin, f))
 
+# Sao chép wallpaper chuẩn vào gói cập nhật và bộ cài đặt
+wallpaper_src = os.path.join(base_dir, "assets", "wallpaper", "cvalms_wallpaper_1920x1080.jpg")
+if os.path.exists(wallpaper_src):
+    shutil.copy2(wallpaper_src, os.path.join(temp_pack, "cvalms_wallpaper.jpg"))
+    shutil.copy2(wallpaper_src, os.path.join(student_bin, "cvalms_wallpaper.jpg"))
+
 def sha256_file(filepath):
     h = hashlib.sha256()
     with open(filepath, "rb") as f:

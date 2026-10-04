@@ -42,6 +42,7 @@ if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
 copy /y "%~dp0bin\CvaLmsAgent.exe" "%INSTALL_DIR%\" >nul
 copy /y "%~dp0bin\CvaLmsService.exe" "%INSTALL_DIR%\" >nul
 copy /y "%~dp0bin\CvaLms.Updater.exe" "%INSTALL_DIR%\" >nul
+if exist "%~dp0bin\cvalms_wallpaper.jpg" copy /y "%~dp0bin\cvalms_wallpaper.jpg" "%INSTALL_DIR%\" >nul
 
 :: Lưu cấu hình máy trạm
 echo {"machineId": "%MACHINE_ID%", "teacherHost": "%TEACHER_IP%"} > "%INSTALL_DIR%\client_config.json"

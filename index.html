@@ -331,6 +331,9 @@
         <button type="button" class="btn-author-entry" id="btn-open-author-info" title="Xem thông tin Tác giả & Bản quyền hệ thống">
           <i class="fas fa-certificate"></i> Tác giả
         </button>
+        <button type="button" class="btn-enter-self-study" id="btn-enter-self-study" title="Mở Không gian Tự học Cá nhân hóa (Học tuần tự 4 bước)">
+          <i class="fas fa-book-reader"></i> Góc Tự Học
+        </button>
         <button type="button" class="btn-teacher-entry" id="btn-open-teacher-login" title="Đăng nhập Bảng điều khiển Giáo viên">
           <i class="fas fa-chalkboard-teacher"></i> Giáo viên
         </button>
@@ -682,6 +685,55 @@ print(s[4:])</code></pre>
   </section>
 
   <!-- =========================================================
+       MÀN HÌNH 2.5: TRUNG TÂM TỰ HỌC CÁ NHÂN HÓA (SELF-STUDY HUB)
+       Chuẩn Thiết kế Google Stitch & Mở khóa tuần tự 4 bước
+  ========================================================== -->
+  <section id="screen-self-study" class="app-screen" style="display:none;">
+    <div class="screen-self-study-wrapper">
+      <!-- Header Tự Học -->
+      <header class="ss-header">
+        <div class="ss-header-left">
+          <button type="button" class="ss-btn-back" onclick="window.CVALMS_SELF_STUDY.backToLobby()" title="Quay lại Sảnh phòng máy">
+            <i class="fas fa-arrow-left"></i> Về Sảnh
+          </button>
+          <div class="ss-header-title-box">
+            <h2 id="ss-header-lesson-title">Bài 12: Thuật toán và sơ đồ khối</h2>
+            <p><i class="fas fa-graduation-cap"></i> Không gian Tự học Cá nhân hóa • Môn Tin học THCS</p>
+          </div>
+        </div>
+
+        <div class="ss-header-progress-wrap">
+          <div class="ss-progress-meta">
+            <span style="color:#94a3b8;"><i class="fas fa-tasks"></i> TIẾN TRÌNH TỰ HỌC:</span>
+            <span class="ssp-percent" id="ss-progress-percent-label" style="color:#38bdf8;">0% Hoàn thành</span>
+          </div>
+          <div class="ss-progress-track">
+            <div class="ss-progress-bar-fill" id="ss-progress-bar-fill"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Thân Tự Học: 2 Cột Chuẩn Stitch -->
+      <div class="ss-body-layout">
+        <!-- Cột Trái: Sidebar Danh mục bài học -->
+        <aside class="ss-sidebar">
+          <div class="ss-sidebar-header">
+            <i class="fas fa-book-reader"></i> DANH SÁCH BÀI TỰ HỌC
+          </div>
+          <div class="ss-sidebar-lesson-list" id="ss-sidebar-lesson-list">
+            <!-- Render động bởi self_study.js -->
+          </div>
+        </aside>
+
+        <!-- Cột Phải: Khung 4 Bước Khóa Mở Tuần Tự -->
+        <main class="ss-main-scroll" id="selfstudy-content-container">
+          <!-- Render động 4 bước tuần tự bởi self_study.js -->
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
        MODAL 1: XÁC NHẬN CHỌN MÁY TÍNH
   ========================================================== -->
   <div class="modal-overlay" id="modal-confirm-machine" style="display:none;">
@@ -755,6 +807,9 @@ print(s[4:])</code></pre>
           </button>
           <button type="button" class="tnt-btn" id="btn-tnav-monitor" onclick="window.teacherSwitchTab('monitor')">
             <i class="fas fa-desktop"></i> 4. Giám Sát Phòng Máy (18 Máy)
+          </button>
+          <button type="button" class="tnt-btn" id="btn-tnav-selfstudy" onclick="window.teacherSwitchTab('selfstudy')">
+            <i class="fas fa-user-graduate"></i> 5. Giám Sát Tự Học
           </button>
         </div>
       </div>
@@ -1826,6 +1881,47 @@ print("2. Cắt xâu:", s[10:17])</textarea>
         </div>
       </section>
 
+      <!-- ====================================================
+           PHÂN HỆ 5: GIÁM SÁT TỰ HỌC & ĐIỀU KHIỂN KHÓA MỞ (TAB SELF-STUDY)
+      ==================================================== -->
+      <section id="teacher-panel-selfstudy" class="teacher-panel" style="display:none;">
+        <div class="panel-monitor-container" style="padding: 20px;">
+          <div class="monitor-toolbar" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn-tool-sm" id="btn-selfstudy-lockall" onclick="window.selfStudySetControl({lockAll: true})" style="background: #ef4444; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                <i class="fas fa-lock"></i> Khóa Toàn Phòng (Focus Lock)
+              </button>
+              <button type="button" class="btn-tool-sm" id="btn-selfstudy-unlockall" onclick="window.selfStudySetControl({lockAll: false})" style="background: #10b981; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                <i class="fas fa-unlock"></i> Mở Khóa Học
+              </button>
+              <div style="display: flex; align-items: center; gap: 6px; margin-left: 8px;">
+                <label style="color: #cbd5e1; font-weight: 600; font-size: 13px;">Giới hạn bước:</label>
+                <select id="select-selfstudy-maxstep" class="th-select" onchange="window.selfStudySetControl({maxStep: parseInt(this.value, 10)})" style="padding: 6px 10px; border-radius: 6px; background: #1e293b; color: #fff; border: 1px solid #334155;">
+                  <option value="1">Bước 1: Mục tiêu</option>
+                  <option value="2">Bước 2: Lý thuyết</option>
+                  <option value="3">Bước 3: Ghi vở</option>
+                  <option value="4" selected>Bước 4: Thử thách (Mở hết)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <a href="self_study.html?role=teacher" target="_blank" class="btn-tool-sm" style="background: #3b82f6; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-weight: 600;">
+                <i class="fas fa-edit"></i> Mở Studio Soạn Bài Giảng
+              </a>
+              <button type="button" class="btn-action-excel" onclick="window.selfStudyExportProgressExcel()" style="background: #059669; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                <i class="fas fa-file-excel"></i> Xuất Báo Cáo Tiến Độ (CSV)
+              </button>
+            </div>
+          </div>
+
+          <!-- Lưới 18 Máy Giám Sát Tiến Trình Tự Học -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;" id="selfstudy-grid-desks">
+            <!-- 18 máy render động bởi js/self_study_monitor.js -->
+          </div>
+        </div>
+      </section>
+
     </main>
   </section>
 
@@ -2259,8 +2355,14 @@ print("2. Cắt xâu:", s[10:17])</textarea>
   <!-- Standalone Script Chạy Độc Lập Chống Lỗi CORS (v3.5.0 Cache-Busted) -->
   <script src="js/bundle.js?v=3.5.0"></script>
 
+  <!-- Module Tự Học Cá Nhân Hóa Chuẩn Stitch -->
+  <script src="js/self_study.js?v=3.5.0"></script>
+
   <!-- Live Lab Monitor (Giám Sát Phòng Máy 18 Máy) -->
   <script src="js/live_monitor.js?v=3.5.0"></script>
+
+  <!-- Phân Hệ Giám Sát Tự Học Thời Gian Thực -->
+  <script src="js/self_study_monitor.js?v=3.5.0"></script>
 </body>
 </html>
 

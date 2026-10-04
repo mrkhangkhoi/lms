@@ -1,0 +1,58 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-10-04T10:00:00Z",
+  "grades": [
+    {
+      "grade": "6",
+      "gradeTitle": "Tin học 6 (Kết nối tri thức)",
+      "lessons": [
+        {
+          "id": "tin6_bai12",
+          "unit": "Chủ đề E: Ứng dụng tin học",
+          "title": "Bài 12: Thuật toán",
+          "duration": "35 phút",
+          "file": "tin6_bai12.json"
+        }
+      ]
+    },
+    {
+      "grade": "7",
+      "gradeTitle": "Tin học 7 (Kết nối tri thức)",
+      "lessons": [
+        {
+          "id": "tin7_bai3",
+          "unit": "Chủ đề A: Máy tính và cộng đồng",
+          "title": "Bài 3: Quản lý dữ liệu trong máy tính",
+          "duration": "35 phút",
+          "file": "tin7_bai3.json"
+        }
+      ]
+    },
+    {
+      "grade": "8",
+      "gradeTitle": "Tin học 8 (Kết nối tri thức)",
+      "lessons": [
+        {
+          "id": "tin8_bai2",
+          "unit": "Chủ đề F: Giải quyết vấn đề với sự trợ giúp của máy tính",
+          "title": "Bài 2: Vòng lặp và thuật toán",
+          "duration": "40 phút",
+          "file": "tin8_bai2.json"
+        }
+      ]
+    },
+    {
+      "grade": "9",
+      "gradeTitle": "Tin học 9 (Kết nối tri thức)",
+      "lessons": [
+        {
+          "id": "tin9_bai1",
+          "unit": "Chủ đề A: Máy tính và xã hội tri thức",
+          "title": "Bài 1: Mạng máy tính và dịch vụ Internet",
+          "duration": "40 phút",
+          "file": "tin9_bai1.json"
+        }
+      ]
+    }
+  ]
+}

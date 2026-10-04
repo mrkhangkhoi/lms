@@ -7406,6 +7406,13 @@
       if (window.LIVE_MONITOR && typeof window.LIVE_MONITOR.onTabOpen === 'function') {
         window.LIVE_MONITOR.onTabOpen();
       }
+    } else if (tab === 'selfstudy') {
+      if (window.SELF_STUDY_MONITOR && typeof window.SELF_STUDY_MONITOR.onTabOpen === 'function') {
+        window.SELF_STUDY_MONITOR.onTabOpen();
+      }
+    }
+    if (tab !== 'selfstudy' && window.SELF_STUDY_MONITOR) {
+      window.SELF_STUDY_MONITOR.onTabClose();
     }
   };
 

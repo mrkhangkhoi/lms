@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 using System.Windows.Forms;
 
 namespace CvaLmsAgent;
@@ -19,6 +21,21 @@ public class ClassroomFocusLockManager
 
     [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     private static extern IntPtr GetModuleHandle(string lpModuleName);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [DllImport("user32.dll")]
+    private static extern bool ClipCursor(ref RECT lpRect);
+
+    [DllImport("user32.dll")]
+    private static extern bool ClipCursor(IntPtr lpRect);
 
     private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
@@ -66,12 +83,23 @@ public class ClassroomFocusLockManager
                     if (scr.Primary)
                     {
                         primaryOverlay = new FocusLockOverlayForm(message, OnEmergencyUnlocked, scr);
-                        _activeForms.Add(primaryOverlay);
+                        lock (_lock)
+                        {
+                            _activeForms.Add(primaryOverlay);
+                        }
+
+                        // Giới hạn chuột trong màn hình khóa chính
+                        var b = scr.Bounds;
+                        RECT r = new RECT { Left = b.Left, Top = b.Top, Right = b.Right, Bottom = b.Bottom };
+                        ClipCursor(ref r);
                     }
                     else
                     {
                         var secondaryOverlay = new FocusLockSecondaryForm(scr);
-                        _activeForms.Add(secondaryOverlay);
+                        lock (_lock)
+                        {
+                            _activeForms.Add(secondaryOverlay);
+                        }
                         secondaryOverlay.Show();
                     }
                 }
@@ -97,13 +125,29 @@ public class ClassroomFocusLockManager
                 _hookId = IntPtr.Zero;
             }
 
+            // Giải phóng giới hạn chuột
+            try
+            {
+                ClipCursor(IntPtr.Zero);
+            }
+            catch
+            {
+            }
+
             foreach (var form in _activeForms)
             {
                 if (form != null && !form.IsDisposed)
                 {
                     try
                     {
-                        form.Invoke(new Action(() => form.Close()));
+                        if (form.IsHandleCreated)
+                        {
+                            form.Invoke(new Action(() => form.Close()));
+                        }
+                        else
+                        {
+                            form.Close();
+                        }
                     }
                     catch
                     {
@@ -292,8 +336,13 @@ public class FocusLockOverlayForm : Form
         }
 
         var pass = _txtPasscode.Text.Trim();
-        // Emergency passcode mặc định của giáo viên THCS
-        if (pass == "123456" || pass == "ThayKhang@2026")
+        // Kiểm tra băm SHA-256 (Cấm tuyệt đối hardcode plain-text và pass 123456)
+        using var sha = SHA256.Create();
+        byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(pass));
+        string hex = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+
+        // SHA-256 của "ThayKhang@2026"
+        if (hex == "33c39cf33ac4a48e2fb588c2fbb99092043744f685a6f5c8d91c8f554139604b")
         {
             _onUnlocked();
         }
@@ -310,6 +359,22 @@ public class FocusLockOverlayForm : Form
                 _lblStatus.Text = $"Sai mật mã! ({_failedAttempts}/5 lần)";
             }
             _txtPasscode.Clear();
+        }
+    }
+
+    protected override void OnDeactivate(EventArgs e)
+    {
+        base.OnDeactivate(e);
+        try
+        {
+            if (!IsDisposed)
+            {
+                TopMost = true;
+                Activate();
+            }
+        }
+        catch
+        {
         }
     }
 }

@@ -1,0 +1,48 @@
+{
+  "id": "tin9_bai1",
+  "grade": "9",
+  "unit": "Chủ đề A: Máy tính và xã hội tri thức",
+  "title": "Bài 1: Mạng máy tính và dịch vụ Internet",
+  "duration": "40 phút",
+  "step1_objectives": {
+    "title": "Mục Tiêu Bài Học & Yêu Cầu Cần Đạt",
+    "items": [
+      "Hiểu được các thành phần chính của mạng máy tính (thiết bị đầu cuối, thiết bị kết nối, đường truyền).",
+      "Phân biệt được mạng có dây và mạng không dây, mạng cục bộ (LAN) và mạng diện rộng (WAN).",
+      "Nêu được lợi ích của việc chia sẻ tài nguyên mạng trong phòng máy thực hành."
+    ]
+  },
+  "step2_theory": {
+    "title": "Khám Phá Kiến Thức Trọng Tâm (Theo SGK)",
+    "sections": [
+      {
+        "heading": "1. Mạng máy tính là gì?",
+        "content": "Mạng máy tính là tập hợp các máy tính và thiết bị được kết nối với nhau theo một phương thức nào đó nhằm trao đổi dữ liệu và chia sẻ tài nguyên (như máy in, tệp tin, đường truyền Internet)."
+      }
+    ]
+  },
+  "step3_notebook": {
+    "title": "Kiến Thức Cốt Lõi Em Ghi Vào Vở",
+    "points": [
+      "1. Mạng LAN (Local Area Network) là mạng kết nối các máy tính trong phạm vi hẹp như phòng học, tòa nhà.",
+      "2. Ba thành phần cơ bản: Thiết bị đầu cuối (PC, laptop), Thiết bị kết nối (Switch, Access Point, Router), Đường truyền (Cáp mạng, Sóng vô tuyến)."
+    ]
+  },
+  "step4_practice": {
+    "title": "Thử Thách Luyện Tập & Chốt Kiến Thức",
+    "quizzes": [
+      {
+        "type": "single_choice",
+        "question": "Mạng máy tính trong phòng thực hành Tin học của trường em thuộc loại mạng nào?",
+        "options": [
+          "A. Mạng toàn cầu WAN",
+          "B. Mạng cục bộ LAN",
+          "C. Mạng đô thị MAN",
+          "D. Mạng vệ tinh"
+        ],
+        "correctIndex": 1,
+        "explanation": "Đúng! Phòng máy của trường là mạng cục bộ (Local Area Network - LAN)."
+      }
+    ]
+  }
+}

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CVALMS - Phân Hệ Tự Học Cá Nhân Hóa</title>
+  <link rel="stylesheet" href="css/self_study.css">
+  <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo">CVALMS TỰ HỌC</div>
+      <div id="deskBadge" class="desk-badge">MAY-01</div>
+    </div>
+
+    <div class="header-progress" id="progressSection">
+      <div class="progress-track">
+        <div id="progressBar" class="progress-fill"></div>
+      </div>
+      <div id="progressPercent" class="progress-text">0%</div>
+    </div>
+
+    <div class="header-actions">
+      <button id="btnToggleStudio" class="btn btn-secondary">⚙️ Soạn bài giảng</button>
+      <button id="btnFullscreen" class="btn btn-secondary">⛶ Toàn màn hình</button>
+      <a href="index.html" class="btn btn-primary">⬅️ Về CVALMS</a>
+    </div>
+  </header>
+
+  <!-- Focus Lock Overlay -->
+  <div id="focusLockOverlay" class="focus-lock-overlay" style="display: none;">
+    <div class="lock-icon">🔒</div>
+    <h2 class="lock-title">Giáo Viên Đang Khóa Phòng Máy</h2>
+    <p class="lock-subtitle">Thầy/Cô yêu cầu cả lớp tạm dừng tự học để chú ý hướng dẫn trên bảng. Vui lòng lắng nghe!</p>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar: Danh sách bài học theo khối -->
+    <aside class="sidebar" id="sidebar">
+      <div class="grade-tabs">
+        <div class="grade-tab active" data-grade="6">Khối 6</div>
+        <div class="grade-tab" data-grade="7">Khối 7</div>
+        <div class="grade-tab" data-grade="8">Khối 8</div>
+        <div class="grade-tab" data-grade="9">Khối 9</div>
+      </div>
+      <div id="lessonList" class="lesson-list">
+        <!-- Nạp động từ manifest.json -->
+      </div>
+    </aside>
+
+    <!-- Main Learning Canvas (Chế độ Học sinh) -->
+    <main class="main-workspace" id="studentWorkspace">
+      <div class="content-wrapper">
+        <div class="lesson-header-card">
+          <div id="lessonUnit" class="lesson-unit-tag">CHỦ ĐỀ</div>
+          <h1 id="lessonTitle" class="lesson-main-title">Chọn một bài học để bắt đầu</h1>
+        </div>
+
+        <div id="stepsContainer">
+          <!-- Bước 1: Mục tiêu -->
+          <div id="stepCard1" class="step-card">
+            <div class="step-header">
+              <div class="step-title-wrap">
+                <div class="step-number">1</div>
+                <div class="step-title">Mục Tiêu Bài Học & Yêu Cầu Cần Đạt</div>
+              </div>
+            </div>
+            <div class="step-body">
+              <ul id="step1List" style="padding-left: 20px; margin-bottom: 20px;"></ul>
+              <button id="btnCompleteStep1" class="btn btn-primary">✓ Tôi đã nắm rõ mục tiêu (Tiếp tục)</button>
+            </div>
+          </div>
+
+          <!-- Bước 2: Khám phá lý thuyết & Media -->
+          <div id="stepCard2" class="step-card locked">
+            <div class="step-header">
+              <div class="step-title-wrap">
+                <div class="step-number">2</div>
+                <div class="step-title">Khám Phá Kiến Thức Trọng Tâm (Theo SGK)</div>
+              </div>
+            </div>
+            <div class="step-body">
+              <div id="mediaBox" class="media-container" style="display: none;"></div>
+              <div id="step2Content"></div>
+              <div id="infographicGrid" class="infographic-grid"></div>
+              <div style="margin-top: 24px;">
+                <button id="btnCompleteStep2" class="btn btn-primary">✓ Đã hoàn thành phần đọc (Chuyển sang ghi vở)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bước 3: Ghi chép cốt lõi -->
+          <div id="stepCard3" class="step-card locked">
+            <div class="step-header">
+              <div class="step-title-wrap">
+                <div class="step-number">3</div>
+                <div class="step-title">Kiến Thức Cốt Lõi Em Ghi Vào Vở</div>
+              </div>
+            </div>
+            <div class="step-body">
+              <div class="notebook-box">
+                <div class="notebook-tag">VỞ GHI TIN HỌC</div>
+                <ul id="step3List" class="notebook-list"></ul>
+              </div>
+              <button id="btnCompleteStep3" class="btn btn-primary">✓ Đã ghi chép xong (Bước vào thử thách)</button>
+            </div>
+          </div>
+
+          <!-- Bước 4: Luyện tập & Đánh giá -->
+          <div id="stepCard4" class="step-card locked">
+            <div class="step-header">
+              <div class="step-title-wrap">
+                <div class="step-number">4</div>
+                <div class="step-title">Thử Thách Luyện Tập & Chốt Kiến Thức</div>
+              </div>
+            </div>
+            <div class="step-body">
+              <div id="clozeContainer"></div>
+              <div id="quizzesContainer"></div>
+              <div id="scoreBanner" class="score-banner" style="display: none;">
+                <div class="score-title">🎉 Chúc mừng em đã hoàn thành bài học!</div>
+                <div id="scoreDetail" class="score-detail">Điểm số: 10/10 (100%)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Teacher Studio Canvas (Chế độ Giáo viên Soạn bài) -->
+    <main class="main-workspace editor-container" id="teacherWorkspace">
+      <div class="content-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h2>Trình Soạn Thảo Bài Học Tự Học</h2>
+          <div style="display: flex; gap: 8px;">
+            <button id="btnNewLesson" class="btn btn-secondary">➕ Tạo mới</button>
+            <button id="btnExportJson" class="btn btn-secondary">📥 Xuất JSON</button>
+            <label class="btn btn-secondary" style="cursor: pointer; margin: 0;">
+              📂 Nạp JSON <input type="file" id="fileImportJson" accept=".json" style="display: none;">
+            </label>
+            <button id="btnSaveLAN" class="btn btn-success">💾 Lưu lên Máy Chủ LAN</button>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="editor-form-group">
+            <label class="editor-label">Mã bài học (ID - viết liền không dấu, vd: tin7_bai4):</label>
+            <input type="text" id="editLessonId" class="editor-input" value="tin7_bai4">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+            <div class="editor-form-group">
+              <label class="editor-label">Khối lớp:</label>
+              <select id="editGrade" class="editor-select">
+                <option value="6">Khối 6</option>
+                <option value="7" selected>Khối 7</option>
+                <option value="8">Khối 8</option>
+                <option value="9">Khối 9</option>
+              </select>
+            </div>
+            <div class="editor-form-group">
+              <label class="editor-label">Tên chủ đề SGK:</label>
+              <input type="text" id="editUnit" class="editor-input" value="Chủ đề A: Máy tính và cộng đồng">
+            </div>
+            <div class="editor-form-group">
+              <label class="editor-label">Thời lượng dự kiến:</label>
+              <input type="text" id="editDuration" class="editor-input" value="35 phút">
+            </div>
+          </div>
+          <div class="editor-form-group">
+            <label class="editor-label">Tên bài học:</label>
+            <input type="text" id="editTitle" class="editor-input" value="Bài 4: Phân loại dữ liệu">
+          </div>
+        </div>
+
+        <!-- Bước 1 Soạn thảo -->
+        <div class="step-card">
+          <h3>Bước 1: Mục tiêu bài học (Mỗi dòng một mục tiêu)</h3>
+          <textarea id="editStep1" class="editor-textarea" style="margin-top: 10px;"></textarea>
+        </div>
+
+        <!-- Bước 2 Soạn thảo -->
+        <div class="step-card">
+          <h3>Bước 2: Khám phá lý thuyết & Đa phương tiện</h3>
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin: 12px 0;">
+            <div>
+              <label class="editor-label">Loại Media:</label>
+              <select id="editMediaType" class="editor-select">
+                <option value="none">Không có media</option>
+                <option value="image">Hình ảnh</option>
+                <option value="video">Video (MP4 hoặc YouTube)</option>
+              </select>
+            </div>
+            <div>
+              <label class="editor-label">Đường dẫn Media (URL hoặc đường dẫn nội bộ LAN):</label>
+              <input type="text" id="editMediaUrl" class="editor-input" placeholder="assets/videos/bai1.mp4 hoặc https://youtube.com/embed/...">
+            </div>
+          </div>
+          <label class="editor-label">Nội dung lý thuyết (Hỗ trợ định dạng Markdown):</label>
+          <textarea id="editStep2" class="editor-textarea"></textarea>
+        </div>
+
+        <!-- Bước 3 Soạn thảo -->
+        <div class="step-card">
+          <h3>Bước 3: Kiến thức cốt lõi ghi vở (Mỗi dòng một ý)</h3>
+          <textarea id="editStep3" class="editor-textarea" style="margin-top: 10px;"></textarea>
+        </div>
+
+        <!-- Bước 4 Soạn thảo câu hỏi -->
+        <div class="step-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3>Bước 4: Ngân hàng câu hỏi trắc nghiệm</h3>
+            <button id="btnAddQuiz" class="btn btn-secondary">➕ Thêm câu hỏi</button>
+          </div>
+          <div id="editorQuizzesList" style="margin-top: 16px;"></div>
+        </div>
+
+        <div style="margin-top: 24px; text-align: right;">
+          <button id="btnSwitchToStudentPreview" class="btn btn-primary">👁️ Xem trước bài học</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/self_study_engine.js"></script>
+  <script src="js/self_study_editor.js"></script>
+  <script src="js/self_study_app.js"></script>
+</body>
+</html>

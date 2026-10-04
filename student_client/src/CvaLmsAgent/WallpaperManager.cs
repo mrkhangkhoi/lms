@@ -110,18 +110,26 @@ public static class WallpaperManager
     private static string? FindWallpaperPath()
     {
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string candidate1 = Path.Combine(baseDir, "cvalms_wallpaper.jpg");
-        if (File.Exists(candidate1)) return candidate1;
+        string[] fileNames = new[] { "cvalms_wallpaper.jpg", "cvalms_wallpaper_1920x1080.jpg" };
+        string[] searchDirs = new[]
+        {
+            baseDir,
+            Path.Combine(baseDir, "assets", "wallpaper"),
+            @"C:\Program Files\CvaLmsClient",
+            @"C:\CVALMS-Agent",
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CVALMS-Agent"),
+            Directory.GetCurrentDirectory(),
+            Path.Combine(Directory.GetCurrentDirectory(), "assets", "wallpaper")
+        };
 
-        string candidate2 = @"C:\CVALMS-Agent\cvalms_wallpaper.jpg";
-        if (File.Exists(candidate2)) return candidate2;
-
-        string localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        string candidate3 = Path.Combine(localApp, "CVALMS-Agent", "cvalms_wallpaper.jpg");
-        if (File.Exists(candidate3)) return candidate3;
-
-        string candidate4 = Path.Combine(Directory.GetCurrentDirectory(), "cvalms_wallpaper.jpg");
-        if (File.Exists(candidate4)) return candidate4;
+        foreach (var dir in searchDirs)
+        {
+            foreach (var fn in fileNames)
+            {
+                string path = Path.Combine(dir, fn);
+                if (File.Exists(path)) return path;
+            }
+        }
 
         return null;
     }
